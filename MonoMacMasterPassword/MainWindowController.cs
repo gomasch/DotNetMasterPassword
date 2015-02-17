@@ -5,6 +5,7 @@ using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMasterPassword;
+using MonoMasterPasswordLib;
 
 namespace MonoMacMasterPassword
 {
@@ -53,21 +54,20 @@ namespace MonoMacMasterPassword
 		public override void AwakeFromNib ()
 		{
 			base.AwakeFromNib ();
+
 			LoadSettings ();
+            SiteList sites = new SiteList();
+            sites.Sites.Add(new Site("keepass", 1));
+            sites.Sites.Add(new Site("office.com", 1, "gomasch@gmail.com"));
+            sites.Sites.Add(new Site("easyjet.com", 1, "mail@gomasch.de"));
+
+            SitesTable.DataSource = new TableViewForSites(sites);
 		}
 
-		// Clipboard
-		private static string[] pboardTypes = new string[] { "NSStringPboardType" };
-
-		partial void CopyToClipboard (MonoMac.Foundation.NSObject sender)
-		{
-			NSPasteboard.GeneralPasteboard.DeclareTypes(pboardTypes, null);
-			NSPasteboard.GeneralPasteboard.SetStringForType(GeneratedPassword.StringValue, pboardTypes[0]);
-		}
-
-		// UI Actions
+        // UI Actions
 		partial void RecalcPassword (MonoMac.Foundation.NSObject sender)
 		{
+            // get data from UI
 			string userName = UserName.StringValue;
 			string masterPass = MasterKey.StringValue;
 			string siteName = SiteName.StringValue;
@@ -81,12 +81,23 @@ namespace MonoMacMasterPassword
 
 			SaveSettings();
 
+            // calculate result
 			var masterkey = MasterPassword.CalcMasterKey(userName, masterPass);
 			var siteKey = MasterPassword.CalcTemplateSeed(masterkey, siteName, counter);
 			string result = MasterPassword.CalcPassword(siteKey, PasswordType.LongPassword);
 
+            // display result
 			GeneratedPassword.StringValue = result;
 		}
+
+        private static string[] pboardTypes = new string[] { "NSStringPboardType" };
+
+        partial void CopyToClipboard (MonoMac.Foundation.NSObject sender)
+        {
+            NSPasteboard.GeneralPasteboard.DeclareTypes(pboardTypes, null);
+            NSPasteboard.GeneralPasteboard.SetStringForType(GeneratedPassword.StringValue, pboardTypes[0]);
+        }
+
 
 		// Helper
 		void LoadSettings ()
