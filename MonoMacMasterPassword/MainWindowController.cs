@@ -4,14 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
-using MonoMasterPassword;
-using MonoMasterPasswordLib;
+using System.IO;
+using MasterPassword.Model;
+using MasterPassword.Core;
 
-namespace MonoMacMasterPassword
+namespace MasterPassword.Mac
 {
 	public partial class MainWindowController : MonoMac.AppKit.NSWindowController
 	{
-		#region Constructors
+        public Configuration Config = new Configuration();
+        public string FileName;
+        public bool FileNameOK;
+
+        #region Constructors
 
 		// Called when created from unmanaged code
 		public MainWindowController (IntPtr handle) : base (handle)
@@ -55,13 +60,9 @@ namespace MonoMacMasterPassword
 		{
 			base.AwakeFromNib ();
 
-			LoadSettings ();
-            SiteList sites = new SiteList();
-            sites.Sites.Add(new Site("keepass", 1));
-            sites.Sites.Add(new Site("office.com", 1, "gomasch@gmail.com"));
-            sites.Sites.Add(new Site("easyjet.com", 1, "mail@gomasch.de"));
+			LoadSettings();
 
-            SitesTable.DataSource = new TableViewForSites(sites);
+            SitesTable.DataSource = new TableViewForSites(Config.Sites);
 		}
 
         // UI Actions
@@ -82,9 +83,9 @@ namespace MonoMacMasterPassword
 			SaveSettings();
 
             // calculate result
-			var masterkey = MasterPassword.CalcMasterKey(userName, masterPass);
-			var siteKey = MasterPassword.CalcTemplateSeed(masterkey, siteName, counter);
-			string result = MasterPassword.CalcPassword(siteKey, PasswordType.LongPassword);
+			var masterkey = Algorithm.CalcMasterKey(userName, masterPass);
+            var siteKey = Algorithm.CalcTemplateSeed(masterkey, siteName, counter);
+            string result = Algorithm.CalcPassword(siteKey, PasswordType.LongPassword);
 
             // display result
 			GeneratedPassword.StringValue = result;
@@ -102,12 +103,32 @@ namespace MonoMacMasterPassword
 		// Helper
 		void LoadSettings ()
 		{
-			if (null == UserName) {
+			if (null == UserName)            
+            {
 				return;
 			}
+
 			UserName.StringValue = NSUserDefaults.StandardUserDefaults.StringForKey ("UserName");
 			SiteName.StringValue = NSUserDefaults.StandardUserDefaults.StringForKey ("SiteName");
 			Counter.StringValue = NSUserDefaults.StandardUserDefaults.StringForKey ("SiteCounter");
+
+            FileNameOK = NSUserDefaults.StandardUserDefaults.BoolForKey("LastFileNameOK");
+            if (FileNameOK)
+            {
+                FileName = NSUserDefaults.StandardUserDefaults.StringForKey("LastFileName");
+                try
+                {
+                    using (var s = File.OpenRead(FileName))
+                        {
+                        Config.Load(s);
+                    }
+                }
+                catch
+                {
+                    Config.Clear();
+                    FileNameOK = false;
+                }
+            }
 		}
 
 		void SaveSettings ()
@@ -115,7 +136,26 @@ namespace MonoMacMasterPassword
 			NSUserDefaults.StandardUserDefaults.SetString(UserName.StringValue, "UserName");
 			NSUserDefaults.StandardUserDefaults.SetString(SiteName.StringValue, "SiteName");
 			NSUserDefaults.StandardUserDefaults.SetString(Counter.StringValue, "SiteCounter");
-			NSUserDefaults.StandardUserDefaults.Synchronize ();
+
+            NSUserDefaults.StandardUserDefaults.SetBool(FileNameOK, "LastFileNameOK");
+            if (FileNameOK)
+            {
+                NSUserDefaults.StandardUserDefaults.SetString(FileName, "LastFileName");
+
+                try
+                {
+                    using (var s = File.OpenWrite(FileName))
+                    {
+                        Config.Save(s);
+                    }
+                }
+                catch
+                {
+                    // what to do? log....
+                }
+            }
+
+            NSUserDefaults.StandardUserDefaults.Synchronize ();
 		}
 	}
 }

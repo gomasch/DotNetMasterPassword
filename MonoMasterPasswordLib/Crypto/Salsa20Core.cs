@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 using System;
 
-namespace MonoMasterPassword
+namespace MasterPassword.Crypto
 {
 	public static class Salsa20Core
 	{

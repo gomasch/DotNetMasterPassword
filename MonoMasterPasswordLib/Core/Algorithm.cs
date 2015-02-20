@@ -2,15 +2,16 @@
 using System.Text;
 using System.Security.Cryptography;
 using System.Collections.Generic;
+using MasterPassword.Crypto;
 
-namespace MonoMasterPassword
+namespace MasterPassword.Core
 {
 	/// <summary>
 	/// contains the core algorithm for Master Password
 	/// 
 	/// http://masterpasswordapp.com/algorithm.html
 	/// </summary>
-	public static class MasterPassword
+	public static class Algorithm
 	{
 		/// <summary>
 		/// Calculates the master key.
@@ -160,19 +161,9 @@ namespace MonoMasterPassword
 			{ 'a', "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz" }, 
 			{ 'n', "0123456789" }, 
 			{ 'o', "@&%?,=[]_:-+*$#!'^~;()/." }, 
-			{ 'X', "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()" } 
+			{ 'x', "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()" }  // Typo in spec, stated X instead of x
 		};
 
-	}
-
-	public enum PasswordType
-	{
-		MaximumSecurityPassword,
-		LongPassword,
-		MediumPassword,
-		ShortPassword,
-		BasicPassword,
-		PIN
 	}
 }
 

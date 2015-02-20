@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #endregion
 
-namespace MonoMasterPassword
+namespace MasterPassword.Crypto
 {
 	using System;
 	using System.Diagnostics;

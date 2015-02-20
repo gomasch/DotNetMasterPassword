@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>MonoMacMasterPassword</string>
+	<string>MonoMasterPasswordMac</string>
 	<key>CFBundleIdentifier</key>
-	<string>de.gomasch.MonoMacMasterPassword</string>
+	<string>de.gomasch.MonoMasterPasswordMac</string>
 	<key>CFBundleName</key>
 	<string>MonoMacMasterPassword</string>
 	<key>CFBundleVersion</key>

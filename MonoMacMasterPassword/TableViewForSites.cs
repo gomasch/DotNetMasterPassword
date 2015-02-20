@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
-using MonoMasterPasswordLib;
+using MasterPassword.Model;
 
-
-namespace MonoMacMasterPassword
+namespace MasterPassword.Mac
 {
     /// <summary>
     /// Table view for sites.
@@ -16,9 +15,9 @@ namespace MonoMacMasterPassword
     [Register ("TableViewDataSource")]
 	public class TableViewForSites : NSTableViewDataSource
 	{
-        public SiteList Sites { get; private set; }
+        public List<SiteEntry> Sites { get; private set; }
 
-		public TableViewForSites (SiteList sites)
+        public TableViewForSites (List<SiteEntry> sites)
 		{
             Sites = sites;
 		}
@@ -27,7 +26,7 @@ namespace MonoMacMasterPassword
 		[Export ("numberOfRowsInTableView:")]
 		public int NumberOfRowsInTableView (NSTableView table)
 		{
-            return Sites.Sites.Count;
+            return Sites.Count;
 		}
 
 		// This method will be called by the control for each column and each row.
@@ -38,12 +37,12 @@ namespace MonoMacMasterPassword
             {   // invalid index
                 return null;
             }
-            if (row > Sites.Sites.Count - 1)
+            if (row > Sites.Count - 1)
             {   // invalid index
                 return null;
             }
                 
-            var item = Sites.Sites[row];
+            var item = Sites[row];
 
             if (col.Identifier == "Counter")
             {

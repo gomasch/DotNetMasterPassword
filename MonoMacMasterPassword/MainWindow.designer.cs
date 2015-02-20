@@ -7,7 +7,7 @@
 using MonoMac.Foundation;
 using System.CodeDom.Compiler;
 
-namespace MonoMacMasterPassword
+namespace MasterPassword.Mac
 {
 	[Register ("MainWindowController")]
 	partial class MainWindowController
