@@ -45,8 +45,25 @@ namespace MasterPassword.Mac
 			dict ["SiteName"] = (NSString)"site";
 			dict ["SiteCounter"] = (NSString)"1";
 			NSUserDefaults.StandardUserDefaults.RegisterDefaults (dict);
+
+
+            // using a delegate
+            this.Window.WillClose += delegate(object sender, EventArgs e)
+                {
+                    NSApplication.SharedApplication.Terminate(this);
+                };
 		}
 
+        // terminate application on windows close:
+        // usage: this.Window.Delegate = new MyWindowDelegate() in Initialize of Window Controller
+        //private class MyWindowDelegate : NSWindowDelegate
+        //{
+        //    public override void WillClose(NSNotification notification)
+        //    {
+        //        // close app
+        //        //NSApplication.SharedApplication.Terminate(notification);
+        //    }
+        //}
 		#endregion
 
 		//strongly typed window accessor
@@ -55,15 +72,17 @@ namespace MasterPassword.Mac
 				return (MainWindow)base.Window;
 			}
 		}
+            
 
 		public override void AwakeFromNib ()
 		{
 			base.AwakeFromNib ();
 
+
 			LoadSettings();
 
             SitesTable.DataSource = new TableViewForSites(Config.Sites);
-		}
+		}            
 
         // UI Actions
 		partial void RecalcPassword (MonoMac.Foundation.NSObject sender)
@@ -123,8 +142,15 @@ namespace MasterPassword.Mac
                         Config.Load(s);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    var alert = new NSAlert
+                    {
+                            MessageText = "Failed to open file " + ex.Message
+                    };
+                    alert.AddButton("OK");
+                    alert.RunModal();
+
                     Config.Clear();
                     FileNameOK = false;
                 }

@@ -3,6 +3,7 @@ using System.Drawing;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
+using MasterPassword.Mac;
 
 namespace MasterPassword.Mac
 {
@@ -19,6 +20,19 @@ namespace MasterPassword.Mac
 			mainWindowController = new MainWindowController ();
 			mainWindowController.Window.MakeKeyAndOrderFront (this);
 		}
+
+        [Action ("newDocument:")]
+        public void NewDocument (MonoMac.Foundation.NSObject sender)
+        {
+            mainWindowController.Window.MakeKeyAndOrderFront(this);
+            // call mainWindowController and tell him to do something new
+        }
+
+        [Action ("openDocument:")]
+        public void OpenDocument (MonoMac.Foundation.NSObject sender)
+        {
+            // call mainWindowController
+        }
 	}
 }
 

@@ -1,5 +1,5 @@
 ﻿
-namespace MonoMacMasterPassword
+namespace MasterPassword.Mac
 {
 	// Should subclass MonoMac.AppKit.NSResponder
 	[MonoMac.Foundation.Register ("AppDelegate")]
