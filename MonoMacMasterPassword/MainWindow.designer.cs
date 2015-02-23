@@ -13,16 +13,10 @@ namespace MasterPassword.Mac
 	partial class MainWindowController
 	{
 		[Outlet]
-		MonoMac.AppKit.NSTextField Counter { get; set; }
-
-		[Outlet]
 		MonoMac.AppKit.NSTextField GeneratedPassword { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSSecureTextField MasterKey { get; set; }
-
-		[Outlet]
-		MonoMac.AppKit.NSTextField SiteName { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSTableView SitesTable { get; set; }
@@ -30,19 +24,20 @@ namespace MasterPassword.Mac
 		[Outlet]
 		MonoMac.AppKit.NSTextField UserName { get; set; }
 
+		[Action ("addSite:")]
+		partial void addSite (MonoMac.Foundation.NSObject sender);
+
 		[Action ("CopyToClipboard:")]
 		partial void CopyToClipboard (MonoMac.Foundation.NSObject sender);
 
 		[Action ("RecalcPassword:")]
 		partial void RecalcPassword (MonoMac.Foundation.NSObject sender);
+
+		[Action ("removeSite:")]
+		partial void removeSite (MonoMac.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (Counter != null) {
-				Counter.Dispose ();
-				Counter = null;
-			}
-
 			if (GeneratedPassword != null) {
 				GeneratedPassword.Dispose ();
 				GeneratedPassword = null;
@@ -53,19 +48,14 @@ namespace MasterPassword.Mac
 				MasterKey = null;
 			}
 
-			if (SiteName != null) {
-				SiteName.Dispose ();
-				SiteName = null;
+			if (SitesTable != null) {
+				SitesTable.Dispose ();
+				SitesTable = null;
 			}
 
 			if (UserName != null) {
 				UserName.Dispose ();
 				UserName = null;
-			}
-
-			if (SitesTable != null) {
-				SitesTable.Dispose ();
-				SitesTable = null;
 			}
 		}
 	}

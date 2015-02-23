@@ -26,12 +26,31 @@ namespace MasterPassword.Mac
         {
             mainWindowController.Window.MakeKeyAndOrderFront(this);
             // call mainWindowController and tell him to do something new
+
+            mainWindowController.NewDocument();
         }
 
         [Action ("openDocument:")]
         public void OpenDocument (MonoMac.Foundation.NSObject sender)
         {
-            // call mainWindowController
+            mainWindowController.OpenDocument();
+        }
+
+        [Action ("saveDocument:")]
+        public void SaveDocument (MonoMac.Foundation.NSObject sender)
+        {
+            mainWindowController.SaveDocument();
+        }
+
+        [Action ("saveDocumentAs:")]
+        public void SaveDocumentAs (MonoMac.Foundation.NSObject sender)
+        {
+            mainWindowController.SaveDocumentAs();
+        }
+
+        public override bool ApplicationShouldTerminateAfterLastWindowClosed (NSApplication sender)
+        {
+            return true;
         }
 	}
 }

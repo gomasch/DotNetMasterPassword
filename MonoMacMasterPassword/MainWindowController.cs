@@ -13,6 +13,8 @@ namespace MasterPassword.Mac
 	public partial class MainWindowController : MonoMac.AppKit.NSWindowController
 	{
         public Configuration Config = new Configuration();
+        public TableViewForSites TableController;
+
         public string FileName;
         public bool FileNameOK;
 
@@ -40,30 +42,8 @@ namespace MasterPassword.Mac
 		// Shared initialization code
 		void Initialize ()
 		{
-			var dict = new NSMutableDictionary ();
-			dict ["UserName"] = (NSString)"User";
-			dict ["SiteName"] = (NSString)"site";
-			dict ["SiteCounter"] = (NSString)"1";
-			NSUserDefaults.StandardUserDefaults.RegisterDefaults (dict);
-
-
-            // using a delegate
-            this.Window.WillClose += delegate(object sender, EventArgs e)
-                {
-                    NSApplication.SharedApplication.Terminate(this);
-                };
 		}
 
-        // terminate application on windows close:
-        // usage: this.Window.Delegate = new MyWindowDelegate() in Initialize of Window Controller
-        //private class MyWindowDelegate : NSWindowDelegate
-        //{
-        //    public override void WillClose(NSNotification notification)
-        //    {
-        //        // close app
-        //        //NSApplication.SharedApplication.Terminate(notification);
-        //    }
-        //}
 		#endregion
 
 		//strongly typed window accessor
@@ -81,23 +61,31 @@ namespace MasterPassword.Mac
 
 			LoadSettings();
 
-            SitesTable.DataSource = new TableViewForSites(Config.Sites);
+            TableController = new TableViewForSites(Config.Sites, SitesTable);
 		}            
 
         // UI Actions
+        partial void addSite (MonoMac.Foundation.NSObject sender)
+        {
+            TableController.Add();
+        }
+
+        partial void removeSite (MonoMac.Foundation.NSObject sender)
+        {
+            TableController.Remove();
+        }
+
 		partial void RecalcPassword (MonoMac.Foundation.NSObject sender)
 		{
             // get data from UI
 			string userName = UserName.StringValue;
 			string masterPass = MasterKey.StringValue;
-			string siteName = SiteName.StringValue;
 
-			int counter = 1;
-			if (!int.TryParse(Counter.StringValue, out counter))
-			{	// failed
-				counter = 1;
-				Counter.StringValue = counter.ToString();
-			}
+            if (SitesTable.SelectedRow < 0) return;
+
+            var currentSite = Config.Sites[SitesTable.SelectedRow];
+            string siteName = currentSite.SiteName;
+            int counter = currentSite.Counter;
 
 			SaveSettings();
 
@@ -126,27 +114,26 @@ namespace MasterPassword.Mac
             {
 				return;
 			}
-
-			UserName.StringValue = NSUserDefaults.StandardUserDefaults.StringForKey ("UserName");
-			SiteName.StringValue = NSUserDefaults.StandardUserDefaults.StringForKey ("SiteName");
-			Counter.StringValue = NSUserDefaults.StandardUserDefaults.StringForKey ("SiteCounter");
-
+                
+            // Load file
             FileNameOK = NSUserDefaults.StandardUserDefaults.BoolForKey("LastFileNameOK");
             if (FileNameOK)
             {
                 FileName = NSUserDefaults.StandardUserDefaults.StringForKey("LastFileName");
+
                 try
                 {
                     using (var s = File.OpenRead(FileName))
-                        {
+                    {
                         Config.Load(s);
                     }
+
                 }
                 catch (Exception ex)
                 {
                     var alert = new NSAlert
                     {
-                            MessageText = "Failed to open file " + ex.Message
+                        MessageText = "Failed to open file " + ex.Message
                     };
                     alert.AddButton("OK");
                     alert.RunModal();
@@ -154,18 +141,19 @@ namespace MasterPassword.Mac
                     Config.Clear();
                     FileNameOK = false;
                 }
+
+                SitesTable.ReloadData();
+                UserName.StringValue = Config.UserName;
             }
 		}
 
 		void SaveSettings ()
 		{
-			NSUserDefaults.StandardUserDefaults.SetString(UserName.StringValue, "UserName");
-			NSUserDefaults.StandardUserDefaults.SetString(SiteName.StringValue, "SiteName");
-			NSUserDefaults.StandardUserDefaults.SetString(Counter.StringValue, "SiteCounter");
-
             NSUserDefaults.StandardUserDefaults.SetBool(FileNameOK, "LastFileNameOK");
             if (FileNameOK)
             {
+                Config.UserName = UserName.StringValue;
+
                 NSUserDefaults.StandardUserDefaults.SetString(FileName, "LastFileName");
 
                 try
@@ -175,14 +163,82 @@ namespace MasterPassword.Mac
                         Config.Save(s);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // what to do? log....
+                    var alert = new NSAlert
+                        {
+                            MessageText = "Failed to save file " + ex.Message
+                        };
+                    alert.AddButton("OK");
+                    alert.RunModal();
                 }
             }
 
             NSUserDefaults.StandardUserDefaults.Synchronize ();
 		}
+
+        public void NewDocument()
+        {
+            FileNameOK = false;
+            Config.Clear();
+
+            // Reset display
+            SitesTable.ReloadData();
+            UserName.StringValue = Config.UserName;
+            MasterKey.StringValue = "";
+        }
+
+        public void OpenDocument()
+        {
+            NSOpenPanel openDlg= new NSOpenPanel();
+
+            openDlg.CanChooseFiles= true;
+
+            int result=openDlg.RunModal();
+
+            if (result== 1)
+            {
+                FileNameOK = true;
+                FileName = openDlg.Url.Path;
+                LoadSettings();
+                MasterKey.StringValue = "";
+            }
+        }
+
+        public void SaveDocument()
+        {
+            if (FileNameOK)
+            {
+                SaveSettings();
+            }
+            else
+            {
+                SaveDocumentAs();
+            }
+        }
+
+        public void SaveDocumentAs()
+        {
+            NSSavePanel saveDlg = new NSSavePanel();
+            saveDlg.CanCreateDirectories = true;
+            saveDlg.AllowedFileTypes = new string[] { "xml", "PDF" };
+            saveDlg.AllowsOtherFileTypes = true;
+
+            if (FileNameOK)
+            {
+                //openDlg.Sta = FileName;
+            }
+
+            int result = saveDlg.RunModal();
+
+            if (result == 1)
+            {
+                FileNameOK = true;
+                FileName = saveDlg.Url.Path;
+                SaveSettings();
+            }
+        }
+
 	}
 }
 

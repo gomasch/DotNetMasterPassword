@@ -15,23 +15,40 @@ namespace MasterPassword.Mac
     [Register ("TableViewDataSource")]
 	public class TableViewForSites : NSTableViewDataSource
 	{
+        NSTableView tableView;
         public List<SiteEntry> Sites { get; private set; }
 
-        public TableViewForSites (List<SiteEntry> sites)
+        public TableViewForSites (List<SiteEntry> sites, NSTableView tableView)
 		{
-            Sites = sites;
+            this.Sites = sites;
+            this.tableView = tableView;
+
+            // register us as the view
+            tableView.DataSource = this;
 		}
 
-		// This method will be called by the NSTableView control to learn the number of rows to display.
-		[Export ("numberOfRowsInTableView:")]
-		public int NumberOfRowsInTableView (NSTableView table)
-		{
+        public void Add()
+        {
+            Sites.Add(new SiteEntry("new site", 1));
+            tableView.ReloadData();
+        }
+
+        public void Remove()
+        {
+            if (this.tableView.SelectedRow > 0)
+            {
+                Sites.RemoveAt(tableView.SelectedRow);
+                tableView.ReloadData();
+            }
+            this.tableView.AbortEditing ();
+        }
+
+		public override int GetRowCount(NSTableView tableView)
+        {
             return Sites.Count;
-		}
+        }
 
-		// This method will be called by the control for each column and each row.
-		[Export ("tableView:objectValueForTableColumn:row:")]
-		public NSObject ObjectValueForTableColumn (NSTableView table, NSTableColumn col, int row)
+        public override NSObject GetObjectValue (NSTableView tableView, NSTableColumn col, int row)      
 		{
             if (row < 0)
             {   // invalid index
@@ -60,10 +77,28 @@ namespace MasterPassword.Mac
             return null;
 		}
 
-        [Export ("tableViewSelectionDidChange:")]       
-        public void SelectionDidChange (MonoMac.Foundation.NSNotification notification)
+        public override void SetObjectValue (NSTableView tableView, NSObject theObject, NSTableColumn tableColumn, int row)
         {
-
+            // http://blog.ac-graphic.net/cocoa-programming-l15-nstableview-editing-values/
+            if (tableColumn.Identifier == "Counter")
+            {
+                int newValue;
+                if (int.TryParse((NSString)theObject, out newValue))
+                {
+                    Sites[row].Counter = newValue;
+                }
+            }
+            else if (tableColumn.Identifier == "Site")
+            {
+                Sites[row].SiteName = (NSString)theObject;
+            }
+            else if (tableColumn.Identifier == "Login")
+            {
+                Sites[row].Login = (NSString)theObject;
+            }
+            else
+                throw new NotImplementedException (string.Format ("{0} is not recognized", 
+                    tableColumn.Identifier));
         }
 	}
 }

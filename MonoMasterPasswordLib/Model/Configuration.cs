@@ -52,11 +52,13 @@ namespace MasterPassword.Model
                     new XElement("Login", entry.Login)
                 ));
             }
+
+            doc.Save(s);
         }
 
         public void Clear()
         {
-            UserName = string.Empty;
+            UserName = "User";
             Sites.Clear();
         }
 
