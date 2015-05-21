@@ -86,13 +86,14 @@ namespace MasterPassword.Mac
             var currentSite = Config.Sites[SitesTable.SelectedRow];
             string siteName = currentSite.SiteName;
             int counter = currentSite.Counter;
+            PasswordType pwType = currentSite.Type;
 
 			SaveSettings();
 
             // calculate result
 			var masterkey = Algorithm.CalcMasterKey(userName, masterPass);
             var siteKey = Algorithm.CalcTemplateSeed(masterkey, siteName, counter);
-            string result = Algorithm.CalcPassword(siteKey, PasswordType.LongPassword);
+            string result = Algorithm.CalcPassword(siteKey, pwType);
 
             // display result
 			GeneratedPassword.StringValue = result;

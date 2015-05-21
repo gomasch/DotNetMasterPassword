@@ -73,6 +73,10 @@ namespace MasterPassword.Mac
             {
                 return new NSString (item.Login.ToString());
             }
+            if (col.Identifier == "PwType")
+            {
+                return new NSString (item.Type.ToString());
+            }
 
             return null;
 		}
@@ -95,6 +99,37 @@ namespace MasterPassword.Mac
             else if (tableColumn.Identifier == "Login")
             {
                 Sites[row].Login = (NSString)theObject;
+            }
+            else if (tableColumn.Identifier == "PwType")
+            {
+                string nameOfItem = (NSString)theObject;
+
+                if (nameOfItem.ToLower().Contains("medium"))
+                {
+                    Sites[row].Type = MasterPassword.Core.PasswordType.MediumPassword;
+                }
+                else if (nameOfItem.ToLower().Contains("long"))
+                {
+                    Sites[row].Type = MasterPassword.Core.PasswordType.LongPassword;
+                }
+                else if (nameOfItem.ToLower().Contains("pin"))
+                {
+                    Sites[row].Type = MasterPassword.Core.PasswordType.PIN;
+                }
+                else if (nameOfItem.ToLower().Contains("short"))
+                {
+                    Sites[row].Type = MasterPassword.Core.PasswordType.ShortPassword;
+                }
+                else if (nameOfItem.ToLower().Contains("max"))
+                {
+                    Sites[row].Type = MasterPassword.Core.PasswordType.MaximumSecurityPassword;
+                }
+                else if (nameOfItem.ToLower().Contains("basic"))
+                {
+                    Sites[row].Type = MasterPassword.Core.PasswordType.BasicPassword;
+                }
+
+                tableView.ReloadData();
             }
             else
                 throw new NotImplementedException (string.Format ("{0} is not recognized", 
