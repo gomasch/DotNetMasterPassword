@@ -159,7 +159,7 @@ namespace MasterPassword.Mac
 
                 try
                 {
-                    using (var s = File.OpenWrite(FileName))
+                    using (var s = File.Create(FileName))
                     {
                         Config.Save(s);
                     }
