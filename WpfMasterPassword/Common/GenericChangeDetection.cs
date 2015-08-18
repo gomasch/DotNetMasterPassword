@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WpfMasterPassword.Common
 {
+    /// <summary>
+    /// this interface detects changes (simpler version of INotifyPropertyChanged)
+    /// </summary>
     public interface IDetectChanges
     {
         event Action DataChanged;
@@ -15,13 +15,17 @@ namespace WpfMasterPassword.Common
 
     /// <summary>
     /// Monitor multiple sources (INotifyPropertyChanged, IDetectChanges, ObservableCollection of ...)
+    /// Dispose to disconnect from monitored stuff (unsubscribe events).
     /// </summary>
     public class GenericChangeDetection : IDetectChanges, IDisposable
     {
-        public event Action DataChanged;
-
         private List<IDisposable> changeMonitors;
 
+        public event Action DataChanged;
+
+        /// <summary>
+        /// Trigger DataChanged event
+        /// </summary>
         public void OnDataChanged()
         {
             var fireEvent = DataChanged;
