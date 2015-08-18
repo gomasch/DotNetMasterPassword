@@ -13,7 +13,9 @@ namespace WpfMasterPassword.Common
         event Action DataChanged;
     }
 
-
+    /// <summary>
+    /// Monitor multiple sources (INotifyPropertyChanged, IDetectChanges, ObservableCollection of ...)
+    /// </summary>
     public class GenericChangeDetection : IDetectChanges, IDisposable
     {
         public event Action DataChanged;
@@ -60,13 +62,22 @@ namespace WpfMasterPassword.Common
         }
 
         /// <summary>
-        /// monitor INotifyPropertyChanged instance
+        /// monitor collection of INotifyPropertyChanged instances
         /// </summary>
-        public void AddCollectionOfIDetectChanges<T>(ObservableCollection<T> collection, Func<T, IDetectChanges> selectWhatToMonitor) where T : class 
+        public void AddCollectionOfIDetectChanges<T>(ObservableCollection<T> collection, Func<T, IDetectChanges> selectWhatToMonitor) where T : class
         {
             Add(new MonitorCollectionOfIDetectChanges<T>(this, collection, selectWhatToMonitor));
         }
 
+        /// <summary>
+        /// monitor collection of INotifyPropertyChanged instances
+        /// </summary>
+        public void AddCollectionOfINotifyPropertyChanged<T>(ObservableCollection<T> collection, Func<T, INotifyPropertyChanged> selectWhatToMonitor) where T : class
+        {
+            Add(new MonitorCollectionOfINotifyPropertyChanged<T>(this, collection, selectWhatToMonitor));
+        }
+
+        #region Implementation
         private void Add(IDisposable item)
         {
             if (null == changeMonitors)
@@ -144,7 +155,11 @@ namespace WpfMasterPassword.Common
 
             private void Sync()
             {
-                var removed = SynchronizeLists.Sync(monitoredItems, collection, (item, tuple) => tuple.Item2 == item, AddItem);
+                var removed = SynchronizeLists.Sync(monitoredItems, collection, (item, tuple) => tuple.Item1 == item, AddItem);
+                foreach (var item in removed)
+                {
+                    item.Item2.DataChanged -= parent.OnDataChanged;
+                }
             }
 
             private Tuple<T, IDetectChanges> AddItem(T item)
@@ -168,5 +183,68 @@ namespace WpfMasterPassword.Common
                 monitoredItems = null;
             }
         }
+
+        private class MonitorCollectionOfINotifyPropertyChanged<T> : IDisposable where T : class
+        {
+            private GenericChangeDetection parent;
+            private ObservableCollection<T> collection;
+            private Func<T, INotifyPropertyChanged> selectWhatToMonitor;
+
+            private List<Tuple<T, INotifyPropertyChanged>> monitoredItems = new List<Tuple<T, INotifyPropertyChanged>>();
+
+            public MonitorCollectionOfINotifyPropertyChanged(GenericChangeDetection parent, ObservableCollection<T> collection, Func<T, INotifyPropertyChanged> selectWhatToMonitor)
+            {
+                this.parent = parent;
+                this.collection = collection;
+                this.selectWhatToMonitor = selectWhatToMonitor;
+
+                collection.CollectionChanged += Collection_CollectionChanged;
+                Sync();
+            }
+
+            private void Collection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+            {
+                Sync();
+            }
+
+            private void Sync()
+            {
+                var removed = SynchronizeLists.Sync(monitoredItems, collection, (item, tuple) => tuple.Item1 == item, AddItem);
+
+                foreach (var item in removed)
+                {
+                    item.Item2.PropertyChanged -= CheckThis_PropertyChanged;
+                }
+            }
+
+            private Tuple<T, INotifyPropertyChanged> AddItem(T item)
+            {
+                INotifyPropertyChanged checkThis = selectWhatToMonitor(item);
+
+                checkThis.PropertyChanged += CheckThis_PropertyChanged;
+
+                return Tuple.Create(item, checkThis);
+            }
+
+            private void CheckThis_PropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                parent.OnDataChanged();
+            }
+
+            public void Dispose()
+            {
+                if (null == monitoredItems) return; // already disposed
+
+                collection.CollectionChanged -= Collection_CollectionChanged;
+
+                foreach (var item in monitoredItems)
+                {
+                    item.Item2.PropertyChanged -= CheckThis_PropertyChanged;
+                }
+
+                monitoredItems = null;
+            }
+        }
+        #endregion
     }
 }
