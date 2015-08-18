@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/MonoMasterPasswordLib/obj
+/MonoMacMasterPassword/bin
+/MonoMasterPasswordLib/bin
+/MonoMacMasterPassword/obj
+/WpfMasterPassword/obj
+/WpfMasterPassword/bin
