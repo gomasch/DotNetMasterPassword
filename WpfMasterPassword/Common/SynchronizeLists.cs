@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WpfMasterPassword.Common
 {
-    class SynchronizeLists
+    public class SynchronizeLists
     {
         /// <summary>
         /// Synchronize one list to another, trying to reduce reallocations, returning removed items
@@ -76,6 +76,41 @@ namespace WpfMasterPassword.Common
             }
 
             return removed;
+        }
+
+        /// <summary>
+        /// Synchronize one list to another, just overwriting the destination, always creating a new item, without much intelligence
+        /// </summary>
+        /// <typeparam name="TSource">item type of source list</typeparam>
+        /// <typeparam name="TDest">itme type if destination list</typeparam>
+        /// <param name="dest">destination list, will be changed</param>
+        /// <param name="source">source list, will be read (only once)</param>
+        /// <param name="factory">create item for destination list for a source item</param>
+        /// <returns>removed items</returns>
+        internal static void Sync<TSource, TDest>(IList<TDest> dest, IEnumerable<TSource> source, Func<TSource, TDest> factory)
+        {
+            int currrentIndex = 0;
+
+            foreach (var sourceItem in source)
+            {
+                var newItem = factory(sourceItem);
+                if (dest.Count < currrentIndex + 1)
+                {   // list not long enough -> add
+                    dest.Add(newItem);
+                }
+                else
+                {   // list long enough - overwrite
+                    dest[currrentIndex] = newItem;
+                }
+
+                currrentIndex++;
+            }
+
+            // remaining items at the end? remove them
+            while (dest.Count > currrentIndex)
+            {
+                dest.RemoveAt(dest.Count - 1); // remove last
+            }
         }
     }
 }
