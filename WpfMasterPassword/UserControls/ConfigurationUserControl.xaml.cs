@@ -14,40 +14,45 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WpfMasterPassword.ViewModel;
 
-namespace WpfMasterPassword
+namespace WpfMasterPassword.UserControls
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ConfigurationUserControl.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ConfigurationUserControl : UserControl
     {
-        public MainWindow()
+        public ConfigurationUserControl()
         {
             InitializeComponent();
         }
     }
 
-    public class MainWindow_DesignTimeData : DocumendViewModel
+    public class ConfigurationUserControl_DesignTimeData : ConfigurationViewModel
     {
-        public MainWindow_DesignTimeData()
+        public ConfigurationUserControl_DesignTimeData()
         {
-            Config.UserName.Value = "John Doe";
+            UserName.Value = "John Doe";
 
             var site = new ConfigurationSiteViewModel();
             site.SiteName.Value = "ebay.com";
             site.Login.Value = "jdoe@gmail.com";
+            site.Type.Value = MasterPassword.Core.PasswordType.LongPassword;
             site.Counter.Value = 3;
-            Config.Sites.Add(site);
+            Sites.Add(site);
 
             site = new ConfigurationSiteViewModel();
             site.SiteName.Value = "ripeyesteaks.com";
             site.Login.Value = "john@gorgelmail.com";
-            Config.Sites.Add(site);
+            site.Type.Value = MasterPassword.Core.PasswordType.PIN;
+            Sites.Add(site);
 
             site = new ConfigurationSiteViewModel();
             site.SiteName.Value = "othersite.com";
             site.Login.Value = "doe@john.org";
-            Config.Sites.Add(site);
+            site.Type.Value = MasterPassword.Core.PasswordType.MaximumSecurityPassword;
+            Sites.Add(site);
+
         }
     }
+
 }

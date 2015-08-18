@@ -8,7 +8,7 @@ using WpfMasterPassword.Common;
 
 namespace WpfMasterPassword.ViewModel
 {
-    public class SiteViewModel
+    public class ConfigurationSiteViewModel
     {
         public PropertyModel<string> SiteName { get; private set; }
         public PropertyModel<string> Login { get; private set; }
@@ -17,11 +17,15 @@ namespace WpfMasterPassword.ViewModel
 
         public GenericChangeDetection DetectChanges { get; private set; }
 
-        public SiteViewModel()
+        private static Tuple<PasswordType, string>[] ThePasswordTypes = Enum.GetValues(typeof(PasswordType)).Cast<PasswordType>().Select(v => Tuple.Create(v, v.ToString())).ToArray();
+
+        public Tuple<PasswordType, string>[] PasswordTypes { get { return ThePasswordTypes; } }
+
+        public ConfigurationSiteViewModel()
         {
             SiteName = new PropertyModel<string>();
             Login = new PropertyModel<string>();
-            Counter = new PropertyModel<int>();
+            Counter = new PropertyModel<int>(1); // default should be 1?
             Type = new PropertyModel<PasswordType>();
 
             DetectChanges = new GenericChangeDetection();

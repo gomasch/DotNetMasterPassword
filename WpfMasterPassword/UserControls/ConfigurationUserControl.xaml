@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="WpfMasterPassword.UserControls.ConfigurationUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfMasterPassword.UserControls"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=local:ConfigurationUserControl_DesignTimeData}"
+             d:DesignHeight="320.36" d:DesignWidth="628.995">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <Label>User Name:</Label>
+            <TextBox Text="{Binding UserName.Value}"/>
+            <Label>Master Password:</Label>
+            <PasswordBox Name="passwordBox"/>
+            <Label>Sites:</Label>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Bottom">
+            <Label>Generated Password:</Label>
+            <TextBox />
+        </StackPanel>
+
+        <DataGrid ItemsSource="{Binding Sites}" AutoGenerateColumns="False" GridLinesVisibility="None" AlternatingRowBackground="Transparent" RowBackground="LightGray" 
+                  CanUserAddRows="False" CanUserDeleteRows="True" CanUserReorderColumns="False" CanUserResizeRows="False" CanUserSortColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Site Name" Binding="{Binding Path=SiteName.Value}">
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Counter" Binding="{Binding Path=Counter.Value}" Width="60" CanUserSort="False"/>
+                <DataGridTextColumn Header="Login" Binding="{Binding Path=Login.Value}">
+                </DataGridTextColumn>
+                <DataGridComboBoxColumn Header="Type" DisplayMemberPath="Item2"  ItemsSource="{Binding GetPasswordTypes}">
+                </DataGridComboBoxColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl>

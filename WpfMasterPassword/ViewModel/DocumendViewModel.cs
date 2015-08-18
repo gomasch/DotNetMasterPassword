@@ -60,7 +60,7 @@ namespace WpfMasterPassword.ViewModel
 
         private bool DoOpen()
         {
-            if (CanDiscardOldData("Open new file")) return false;
+            if (!CanDiscardOldData("Open new file")) return false;
 
             // ask for file name
             var dlg = new OpenFileDialog();
@@ -161,7 +161,7 @@ namespace WpfMasterPassword.ViewModel
         {
             try
             {
-                using (var file = File.Create(fileName))
+                using (var file = File.OpenRead(fileName))
                 {
                     Config.ReadXml(file);
                 }
@@ -180,7 +180,7 @@ namespace WpfMasterPassword.ViewModel
 
         private void DoNew()
         {
-            if (CanDiscardOldData("Create New Configuration")) return;
+            if (!CanDiscardOldData("Create New Configuration")) return;
 
             Config.Reset();
 

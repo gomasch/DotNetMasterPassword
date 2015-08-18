@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using WpfMasterPassword.Common;
@@ -13,7 +14,8 @@ namespace WpfMasterPassword.ViewModel
     public class ConfigurationViewModel
     {
         public PropertyModel<string> UserName { get; private set; }
-        public ObservableCollection<SiteViewModel> Sites { get; private set; }
+
+        public ObservableCollection<ConfigurationSiteViewModel> Sites { get; private set; }
 
         public GenericChangeDetection DetectChanges { get; private set; }
 
@@ -21,7 +23,7 @@ namespace WpfMasterPassword.ViewModel
         {
             UserName = new PropertyModel<string>();
 
-            Sites = new ObservableCollection<SiteViewModel>();
+            Sites = new ObservableCollection<ConfigurationSiteViewModel>();
 
             DetectChanges = new GenericChangeDetection();
             DetectChanges.AddINotifyPropertyChanged(UserName);
@@ -49,10 +51,17 @@ namespace WpfMasterPassword.ViewModel
 
             // apply it's changes to us
             UserName.Value = config.UserName;
-            UserName.Value = config.UserName;
 
-            SynchronizeLists.Sync(config.Sites, Sites, (a, b) => false, site => new SiteEntry(site.SiteName.Value, site.Counter.Value, site.Login.Value, site.Type.Value));
-
+            SynchronizeLists.Sync(Sites, config.Sites, siteXml =>
+            {
+                var site = new ConfigurationSiteViewModel();
+                site.Login.Value = siteXml.Login;
+                site.SiteName.Value = siteXml.SiteName;
+                site.Counter.Value = siteXml.Counter;
+                site.Type.Value = siteXml.Type;
+                return site;
+            }
+            );
         }
 
         public void Reset()
