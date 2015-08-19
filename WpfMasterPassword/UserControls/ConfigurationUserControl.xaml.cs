@@ -25,6 +25,16 @@ namespace WpfMasterPassword.UserControls
         {
             InitializeComponent();
         }
+
+        private void passwordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            // forward to view model, we can't bind it directly
+            var viewModel = DataContext as ConfigurationViewModel;
+            if (null != viewModel)
+            {
+                viewModel.CurrentMasterPassword.Value = passwordBox.SecurePassword;
+            }
+        }
     }
 
     public class ConfigurationUserControl_DesignTimeData : ConfigurationViewModel
@@ -36,20 +46,20 @@ namespace WpfMasterPassword.UserControls
             var site = new ConfigurationSiteViewModel();
             site.SiteName.Value = "ebay.com";
             site.Login.Value = "jdoe@gmail.com";
-            site.Type.Value = MasterPassword.Core.PasswordType.LongPassword;
+            site.TypeOfPassword.Value = MasterPassword.Core.PasswordType.LongPassword;
             site.Counter.Value = 3;
             Sites.Add(site);
 
             site = new ConfigurationSiteViewModel();
             site.SiteName.Value = "ripeyesteaks.com";
             site.Login.Value = "john@gorgelmail.com";
-            site.Type.Value = MasterPassword.Core.PasswordType.PIN;
+            site.TypeOfPassword.Value = MasterPassword.Core.PasswordType.PIN;
             Sites.Add(site);
 
             site = new ConfigurationSiteViewModel();
             site.SiteName.Value = "othersite.com";
             site.Login.Value = "doe@john.org";
-            site.Type.Value = MasterPassword.Core.PasswordType.MaximumSecurityPassword;
+            site.TypeOfPassword.Value = MasterPassword.Core.PasswordType.MaximumSecurityPassword;
             Sites.Add(site);
 
         }

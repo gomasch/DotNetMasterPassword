@@ -13,7 +13,7 @@ namespace WpfMasterPassword.ViewModel
         public PropertyModel<string> SiteName { get; private set; }
         public PropertyModel<string> Login { get; private set; }
         public PropertyModel<int> Counter { get; private set; }
-        public PropertyModel<PasswordType> Type { get; private set; }
+        public PropertyModel<PasswordType> TypeOfPassword { get; private set; }
 
         public GenericChangeDetection DetectChanges { get; private set; }
 
@@ -26,13 +26,13 @@ namespace WpfMasterPassword.ViewModel
             SiteName = new PropertyModel<string>();
             Login = new PropertyModel<string>();
             Counter = new PropertyModel<int>(1); // default should be 1?
-            Type = new PropertyModel<PasswordType>();
+            TypeOfPassword = new PropertyModel<PasswordType>();
 
             DetectChanges = new GenericChangeDetection();
             DetectChanges.AddINotifyPropertyChanged(SiteName);
             DetectChanges.AddINotifyPropertyChanged(Login);
             DetectChanges.AddINotifyPropertyChanged(Counter);
-            DetectChanges.AddINotifyPropertyChanged(Type);
+            DetectChanges.AddINotifyPropertyChanged(TypeOfPassword);
         }
     }
 }

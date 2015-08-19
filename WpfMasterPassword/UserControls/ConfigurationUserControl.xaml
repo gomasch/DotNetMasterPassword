@@ -6,30 +6,66 @@
              xmlns:local="clr-namespace:WpfMasterPassword.UserControls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=local:ConfigurationUserControl_DesignTimeData}"
-             d:DesignHeight="320.36" d:DesignWidth="628.995">
+             d:DesignHeight="289.36" d:DesignWidth="600.995">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
             <Label>User Name:</Label>
             <TextBox Text="{Binding UserName.Value}"/>
             <Label>Master Password:</Label>
-            <PasswordBox Name="passwordBox"/>
-            <Label>Sites:</Label>
+            <PasswordBox Name="passwordBox" PasswordChanged="passwordBox_PasswordChanged"/>
+            <DockPanel>
+                <Button Content="Add Site" DockPanel.Dock="Right" Command="{Binding Add}"/>
+                <Label>Sites:</Label>
+            </DockPanel>
         </StackPanel>
         <StackPanel DockPanel.Dock="Bottom">
-            <Label>Generated Password:</Label>
-            <TextBox />
+            <DockPanel >
+                <Button Content="Copy To Clipboard" Command="{Binding CopyToClipBoard}" DockPanel.Dock="Right" Margin="10,0,0,0"/>
+                <Label Content="{Binding GeneratedForSite.Value}" DockPanel.Dock="Right"/>
+                <Label Content="for" DockPanel.Dock="Right"/>
+                <Label Content="Generated Password:" />
+            </DockPanel>
+            <TextBox Text="{Binding GeneratedPassword.Value, Mode=OneWay}" ToolTip="Used: global user name, global master password, site name, site counter, site type of password"/>
         </StackPanel>
 
         <DataGrid ItemsSource="{Binding Sites}" AutoGenerateColumns="False" GridLinesVisibility="None" AlternatingRowBackground="Transparent" RowBackground="LightGray" 
                   CanUserAddRows="False" CanUserDeleteRows="True" CanUserReorderColumns="False" CanUserResizeRows="False" CanUserSortColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Site Name" Binding="{Binding Path=SiteName.Value}">
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="Counter" Binding="{Binding Path=Counter.Value}" Width="60" CanUserSort="False"/>
-                <DataGridTextColumn Header="Login" Binding="{Binding Path=Login.Value}">
-                </DataGridTextColumn>
-                <DataGridComboBoxColumn Header="Type" DisplayMemberPath="Item2"  ItemsSource="{Binding GetPasswordTypes}">
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Get Password" ToolTip="Generate individual password for this site, based on site name, counter and type (not: the noted login is not used)" CommandParameter="{Binding}" Command="{Binding DataContext.GeneratePassword, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTextColumn Header="Site Name" Binding="{Binding Path=SiteName.Value}" Width="*" MinWidth="80"/>
+
+                <DataGridComboBoxColumn Header="Type" DisplayMemberPath="Item2" SelectedValuePath="Item1" SelectedValueBinding="{Binding TypeOfPassword.Value}"
+                                        MinWidth="160">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding Path=PasswordTypes}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource" Value="{Binding Path=PasswordTypes}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
                 </DataGridComboBoxColumn>
+                
+                <DataGridTextColumn Header="Counter" Binding="{Binding Path=Counter.Value}" Width="60" CanUserSort="False"/>
+                
+                <DataGridTextColumn Header="Login (not used)" Binding="{Binding Path=Login.Value}"/>
+                
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="X" ToolTip="Remove" CommandParameter="{Binding}" Command="{Binding DataContext.Remove, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

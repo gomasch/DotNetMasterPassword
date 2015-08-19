@@ -16,6 +16,8 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding Open}"/>
                 <MenuItem Header="_Save" Command="{Binding Save}"/>
+                <MenuItem Header="Save _As" Command="{Binding SaveAs}"/>
+                <MenuItem Header="_New" Command="{Binding New}"/>
             </MenuItem>
         </Menu>
         <UserControls:ConfigurationUserControl DataContext="{Binding Config}"/>
