@@ -9,6 +9,7 @@ using System.Windows.Input;
 namespace WpfMasterPassword.Common
 {
     // taken from Prism https://github.com/PrismLibrary/Prism
+    // adjusted for using CommandManager.RequerySuggested
 
     /// <summary>
     /// An <see cref="ICommand"/> whose delegates can be attached for <see cref="Execute"/> and <see cref="CanExecute"/>.
