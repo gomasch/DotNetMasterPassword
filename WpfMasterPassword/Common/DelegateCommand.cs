@@ -66,7 +66,6 @@ namespace WpfMasterPassword.Common
                     throw new InvalidCastException("Resources.DelegateCommandInvalidGenericPayloadType");
                 }
             }
-
         }
 
         /// <summary>
