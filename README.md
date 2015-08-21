@@ -5,7 +5,7 @@ This is an independent C# implementation of the Master Password Algorithm http:/
 Not very polished so far, but it works.
 
 Project Overview (all .NET):
-* MonoMasterPasswordLib - contains basic algorithm, see http://masterpasswordapp.com/algorithm.html for basic description
+* MonoMasterPasswordLib - contains basic algorithm, see http://masterpasswordapp.com/algorithm.html for detailed description of the algorithm.
 * ConsoleMasterPassword - command line client (.NET 4.5)
 * WpfMasterPassword - simplistic WPF Windows App (.NET 4.5)
 * MonoMacMasterPassword - simplistic Mac App built with Xamarin Studio and XCode (Mono 4.0.0)
