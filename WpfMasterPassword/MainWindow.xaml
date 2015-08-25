@@ -7,7 +7,7 @@
         xmlns:vm="clr-namespace:WpfMasterPassword.ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=local:MainWindow_DesignTimeData}"
-        Title=".NET Master Password" Height="390" Width="703" WindowStartupLocation="CenterScreen">
+        Title=".NET Master Password" Height="390" Width="703" WindowStartupLocation="CenterScreen" Icon="Icon.ico">
     <Window.DataContext>
         <vm:DocumendViewModel/>
     </Window.DataContext>
