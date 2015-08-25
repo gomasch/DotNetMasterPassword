@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- this XML schema documents the format used to save the data from the DotNetMasterPassword app
+       MS 2015-08-25 -->
+  <xs:element name="MasterPassword">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="UserName" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>User name, used as a salt for the password generation</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Sites">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Site" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="SiteName" type="xs:string">
+                      <xs:annotation>
+                        <xs:documentation>name of the website, e.g. othersite.com, used for the password generation</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Counter" type="xs:int">
+                      <xs:annotation>
+                        <xs:documentation>counter for the password generation, default value is 1, increase to have a different password for the site</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Login" type="xs:string">
+                      <xs:annotation>
+                        <xs:documentation>hint how you log into the site, is NOT used for the password generation</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Type">
+                      <xs:annotation>
+                        <xs:documentation>type of the password to generate for this site</xs:documentation>
+                      </xs:annotation>
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="MaximumSecurityPassword"/>
+                          <xs:enumeration value="LongPassword"/>
+                          <xs:enumeration value="MediumPassword"/>
+                          <xs:enumeration value="ShortPassword"/>
+                          <xs:enumeration value="BasicPassword"/>
+                          <xs:enumeration value="PIN"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
