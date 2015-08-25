@@ -10,7 +10,7 @@ using System.Reflection;
 [assembly: AssemblyCompany("gomasch.de")]
 [assembly: AssemblyCopyright("Copyright © Martin Schmidt")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("en")]
+[assembly: AssemblyCulture("")]
 
 // define in assembly: [assembly: ComVisible()]
 // define in assembly: [assembly: Guid()]
