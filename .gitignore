@@ -2,12 +2,13 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/MonoMasterPasswordLib/obj
+/MasterPasswordLib/bin
+/MasterPasswordLib/obj
 /MonoMacMasterPassword/bin
-/MonoMasterPasswordLib/bin
 /MonoMacMasterPassword/obj
-/WpfMasterPassword/obj
 /WpfMasterPassword/bin
+/WpfMasterPassword/obj
 /ConsoleMasterPassword/bin
 /ConsoleMasterPassword/obj
 /.vs
+/Dist
