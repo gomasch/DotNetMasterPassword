@@ -19,6 +19,8 @@ namespace WpfMasterPassword.ViewModel
         public PropertyModel<string> UserName { get; private set; }
         public ObservableCollection<ConfigurationSiteViewModel> Sites { get; private set; }
 
+        public PropertyModel<ConfigurationSiteViewModel> SelectedItem { get; private set; }
+
         public PropertyReadonlyModel<string> GeneratedForSite { get; private set; }
         public PropertyReadonlyModel<string> GeneratedPassword { get; private set; }
 
@@ -27,8 +29,8 @@ namespace WpfMasterPassword.ViewModel
         // Commands
         public DelegateCommand Add { get; private set; }
         public DelegateCommand<ConfigurationSiteViewModel> Remove { get; private set; }
-        public DelegateCommand<ConfigurationSiteViewModel> GeneratePassword { get; private set; }
 
+        public DelegateCommand GeneratePassword { get; private set; }
         public DelegateCommand CopyToClipBoard { get; private set; }
 
         // Change Detection
@@ -40,6 +42,8 @@ namespace WpfMasterPassword.ViewModel
             UserName = new PropertyModel<string>();
             Sites = new ObservableCollection<ConfigurationSiteViewModel>();
 
+            SelectedItem = new PropertyModel<ConfigurationSiteViewModel>();
+
             GeneratedForSite = new PropertyReadonlyModel<string>();
             GeneratedPassword = new PropertyReadonlyModel<string>();
             CurrentMasterPassword = new PropertyModel<SecureString>();
@@ -47,7 +51,7 @@ namespace WpfMasterPassword.ViewModel
             // Commands
             Add = new DelegateCommand(() => Sites.Add(new ConfigurationSiteViewModel()));
             Remove = new DelegateCommand<ConfigurationSiteViewModel>(item => Sites.Remove(item));
-            GeneratePassword = new DelegateCommand<ConfigurationSiteViewModel>(DoGeneratePassword, item => CurrentMasterPassword.Value != null);
+            GeneratePassword = new DelegateCommand(DoGeneratePassword, () => CurrentMasterPassword.Value != null && SelectedItem.Value != null);
             CopyToClipBoard = new DelegateCommand(() => Clipboard.SetText(GeneratedPassword.Value), () => !string.IsNullOrEmpty(GeneratedPassword.Value) && CurrentMasterPassword.Value != null);
 
             // Change detection
@@ -56,8 +60,10 @@ namespace WpfMasterPassword.ViewModel
             DetectChanges.AddCollectionOfIDetectChanges(Sites, item => item.DetectChanges);
         }
 
-        private void DoGeneratePassword(ConfigurationSiteViewModel selectedEntry)
+        private void DoGeneratePassword()
         {
+            var selectedEntry = SelectedItem.Value;
+
             string pw = new System.Net.NetworkCredential(string.Empty, CurrentMasterPassword.Value).Password;
             var masterkey = Algorithm.CalcMasterKey(UserName.Value, pw);
             var templateSeed = Algorithm.CalcTemplateSeed(masterkey, selectedEntry.SiteName.Value, selectedEntry.Counter.Value);            GeneratedPassword.SetValue(Algorithm.CalcPassword(templateSeed, selectedEntry.TypeOfPassword.Value));
@@ -96,11 +102,13 @@ namespace WpfMasterPassword.ViewModel
                 return site;
             }
             );
+
+            SelectedItem.Value = Sites.FirstOrDefault();
         }
 
         public void Reset()
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

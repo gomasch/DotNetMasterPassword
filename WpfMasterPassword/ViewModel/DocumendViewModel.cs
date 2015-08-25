@@ -25,12 +25,13 @@ namespace WpfMasterPassword.ViewModel
         public ConfigurationViewModel Config { get; private set; }
 
         const string FileFilter = "MasterPassword file (*.xml)|*.xml|All files (*.*)|*.*";
+        const string FileNameNew = "<new>";
 
         public DocumendViewModel()
         {
             HasChanges = new PropertyReadonlyModel<bool>();
             FilePathValid = new PropertyReadonlyModel<bool>();
-            FilePathName = new PropertyReadonlyModel<string>();
+            FilePathName = new PropertyReadonlyModel<string>(FileNameNew);
 
             Open = new DelegateCommand(() => DoOpen());
             Save = new DelegateCommand(() => DoSave());
@@ -184,10 +185,9 @@ namespace WpfMasterPassword.ViewModel
 
             Config.Reset();
 
-            FilePathName.SetValue("<new>");
+            FilePathName.SetValue(FileNameNew);
             FilePathValid.SetValue(false);
             HasChanges.SetValue(false);
-
         }
     }
 }

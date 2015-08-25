@@ -56,6 +56,8 @@ namespace WpfMasterPassword.UserControls
             site.TypeOfPassword.Value = MasterPassword.Core.PasswordType.PIN;
             Sites.Add(site);
 
+            SelectedItem.Value = site;
+
             site = new ConfigurationSiteViewModel();
             site.SiteName.Value = "othersite.com";
             site.Login.Value = "doe@john.org";
