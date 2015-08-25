@@ -1,25 +1,27 @@
 ﻿using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("WpfMasterPassword")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("WpfMasterPassword")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2015")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
+[assembly: AssemblyTitle("WpfMasterPassword")]
+[assembly: AssemblyDescription("GUI Version of .NET Master Password")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyProduct("")]
+
+// defined globally: [assembly: AssemblyCompany()]
+// defined globally: [assembly: AssemblyCopyright()]
+// defined globally: [assembly: AssemblyTrademark()]
+// defined globally: [assembly: AssemblyCulture()]
+
 [assembly: ComVisible(false)]
+// not defined, not needed: [assembly: Guid()]
+
+// defined globally: [assembly: AssemblyVersion()]
+// defined globally: [assembly: AssemblyFileVersion()]
+// defined globally: [assembly: AssemblyInformationalVersion()] // "Product Version"
+
+
+// UI stuff:
 
 //In order to begin building localizable applications, set 
 //<UICulture>CultureYouAreCodingWith</UICulture> in your .csproj file
@@ -30,7 +32,6 @@ using System.Windows;
 
 //[assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.Satellite)]
 
-
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None, //where theme specific resource dictionaries are located
                                      //(used if a resource is not found in the page, 
@@ -40,16 +41,3 @@ using System.Windows;
                                               // app, or any theme specific resource dictionaries)
 )]
 
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.01.00")]
-[assembly: AssemblyFileVersion("1.01.00")]
