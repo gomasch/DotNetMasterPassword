@@ -1,14 +1,22 @@
 # DotNetMasterPassword
 .NET Implementation of the Master Password Algorithm
 
-This is an independent C# implementation of the Master Password Algorithm http://masterpasswordapp.com/.
-Not very polished so far, but it works.
+This is an independent implementation for Windows in C# of the Master Password Algorithm http://masterpasswordapp.com/.
+
+The original master password apps and the concept is from Maarten Billemont, Lyndir. The repository here is just an independent implementation in .NET from a different author.
+
+The basic idea is that you remember just one secret password that is never stored anywhere. You dynamically generate individual passwords for each site that you use.
+The list of sites that you use can be saved or re-entered on different devices (e.g. your smartphones and pads) and machines (your PCs/Macs at home or at work).
+Provided that the apps use the same algorithm and the same base data (your global name, your one master password, name of the site, counter and passwordtype for the site)
+the passwords can be dynamically recreated everywhere. If a site is hacked then only that one specific password is compromised, not your other passwords. This 
+rests on a specific cryptographic one-way-algorithm that makes it very hard to guess the master password from the site specific password. This is a brilliant concept IMO.
 
 Project Overview (all .NET):
 * MonoMasterPasswordLib - contains basic algorithm, see http://masterpasswordapp.com/algorithm.html for detailed description of the algorithm.
 * ConsoleMasterPassword - command line client (.NET 4.5)
-* WpfMasterPassword - simplistic WPF Windows App (.NET 4.5)
-* MonoMacMasterPassword - simplistic Mac App built with Xamarin Studio and XCode (Mono 4.0.0)
+* WpfMasterPassword - simple WPF Windows App (.NET 4.5)
+* MonoMacMasterPassword - simplistic Mac App built with Xamarin Studio and XCode (Mono 4.0.0).
+  Maarten Billemont also has a Mac app though at http://masterpasswordapp.com/, please consider that instead.
 
 Tools used:
 * Windows: Visual Studio 2015
