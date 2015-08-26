@@ -156,7 +156,7 @@ namespace WpfMasterPassword.ViewModel
             {
                 try
                 {
-                    PerformOpen(FilePathName.Value);
+                    PerformSave(FilePathName.Value);
                     return true;
                 }
                 catch (Exception ex)
