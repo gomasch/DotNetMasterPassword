@@ -26,7 +26,7 @@ Screenshots
 
 ![Windows GUI Screenshot](WpfMasterPassword/Screenshot.png?raw=true "Windows GUI Screenshot")
 
-Some source code was taken from other sources:
+Some code was taken from other sources:
 * https://github.com/ChrisMcKee/cryptsharp for the implementation of Pbkdf2 and some other crypto base stuff
 * https://github.com/PrismLibrary/Prism for some WPF base classes DelegateCommand and BindableBase 
 * http://blogs.msdn.com/b/davidrickard/archive/2010/03/09/saving-window-size-and-location-in-wpf-and-winforms.aspx for window placement
