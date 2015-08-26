@@ -21,6 +21,26 @@ namespace WpfMasterPassword.UserControls
     /// </summary>
     public partial class ConfigurationUserControl : UserControl
     {
+        // trick to reset password box
+        public bool ResetPassword
+        {
+            get { return (bool)GetValue(ResetPasswordProperty); }
+            set { SetValue(ResetPasswordProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for MyProperty.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ResetPasswordProperty =
+            DependencyProperty.Register("ResetPassword", typeof(bool), typeof(ConfigurationUserControl), new PropertyMetadata(false, ResetPasswordChangedCallback));
+
+        static void ResetPasswordChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as ConfigurationUserControl;
+
+            if (null == control) return;
+            if (!true.Equals(e.NewValue)) return;
+            control.passwordBox.Clear();
+        }
+
         public ConfigurationUserControl()
         {
             InitializeComponent();

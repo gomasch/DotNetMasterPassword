@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace WpfMasterPassword.Common
 {
@@ -105,6 +106,15 @@ namespace WpfMasterPassword.Common
         public void RaiseOnPropertyChanged()
         {
             OnPropertyChanged(() => Value);
+        }
+
+        public void MonitorForChanges(params INotifyPropertyChanged[] monitorThese)
+        {
+            // fire PropertyChanged whenever on of these guys changes
+            foreach (var item in monitorThese)
+            {
+                item.PropertyChanged += delegate { RaiseOnPropertyChanged(); };
+            }
         }
     }
 }

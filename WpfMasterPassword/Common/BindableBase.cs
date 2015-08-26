@@ -65,6 +65,7 @@ namespace WpfMasterPassword.Common
                 eventHandler(this, new PropertyChangedEventArgs(null)); // ALL
             }
         }
+
         /// <summary>
         /// Raises this object's PropertyChanged event.
         /// </summary>

@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfMasterPassword.Common;
+using WpfMasterPassword.Properties;
 using WpfMasterPassword.ViewModel;
 
 namespace WpfMasterPassword
@@ -24,6 +26,41 @@ namespace WpfMasterPassword
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Settings.Default.MainWindowPlacement = this.GetPlacement();
+
+            // inform about closing idea (allow viewmodel to cancel closing)
+            var viewModel = DataContext as DocumendViewModel;
+            if (null != viewModel)
+            {
+                viewModel.OnClose(e);
+            }
+
+            Settings.Default.Save();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            this.SetPlacement(Settings.Default.MainWindowPlacement);
+        }
+
+        private void Window_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                // Note that you can have more than one file.
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                var viewModel = DataContext as DocumendViewModel;
+                if (null != viewModel)
+                {
+                    viewModel.OpenFileFromDrop(files[0]);
+                }
+            }
         }
     }
 

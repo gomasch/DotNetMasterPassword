@@ -8,11 +8,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using WpfMasterPassword.Common;
+using System.ComponentModel;
+using WpfMasterPassword.Properties;
+using System.Diagnostics;
+using WpfMasterPassword.Dialogs;
 
 namespace WpfMasterPassword.ViewModel
 {
     public class DocumendViewModel : BindableBase
     {
+        public PropertyDelegateReadonlyModel<string> WindowTitle { get; private set; }
+
+
         public PropertyReadonlyModel<bool> HasChanges { get; private set; }
         public PropertyReadonlyModel<bool> FilePathValid { get; private set; }
         public PropertyReadonlyModel<string> FilePathName { get; private set; }
@@ -29,9 +36,11 @@ namespace WpfMasterPassword.ViewModel
 
         public DocumendViewModel()
         {
+            WindowTitle = new PropertyDelegateReadonlyModel<string>(() => ".NET Master Password - " + FilePathName.Value + " " + (HasChanges.Value ? "*" : ""));
             HasChanges = new PropertyReadonlyModel<bool>();
             FilePathValid = new PropertyReadonlyModel<bool>();
             FilePathName = new PropertyReadonlyModel<string>(FileNameNew);
+            WindowTitle.MonitorForChanges(HasChanges, FilePathName);
 
             Open = new DelegateCommand(() => DoOpen());
             Save = new DelegateCommand(() => DoSave());
@@ -40,6 +49,52 @@ namespace WpfMasterPassword.ViewModel
 
             // data
             Config = new ConfigurationViewModel();
+            Config.DetectChanges.DataChanged += () => HasChanges.SetValue(true);
+
+            // try to load last file
+            try
+            {
+                if (Settings.Default.HasMostRecentFile)
+                {   // we have an old path
+                    PerformOpen(Settings.Default.MostRecentFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+            }
+
+            HasChanges.SetValue(false);
+        }
+
+        /// <summary>
+        /// call from MainWindow when dropping a file
+        /// </summary>
+        public void OpenFileFromDrop(string fileName)
+        {
+            try
+            {
+                PerformOpen(fileName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not read/interpret dropped file " + Environment.NewLine + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// call from MainWindow in Closing event
+        /// </summary>
+        public void OnClose(CancelEventArgs e)
+        {
+            if (!CanDiscardOldData("Closing App"))
+            {   // this would lose data, do not close
+                e.Cancel = true;
+            }
+
+            // store file name in settings
+            Settings.Default.HasMostRecentFile = FilePathValid.Value;
+            Settings.Default.MostRecentFile = FilePathValid.Value ? FilePathName.Value : string.Empty; // store empty string if no valid file name
         }
 
         private bool CanDiscardOldData(string captionForQuestion)
@@ -50,13 +105,21 @@ namespace WpfMasterPassword.ViewModel
             }
 
             // ask user
-            var result = MessageBox.Show("Do you want to discard your current changes?", captionForQuestion, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+            var result = CustomMessageBox.ShowYesNoCancel(
+                "Do you want to save your current changes?", captionForQuestion, 
+                "Save", "Don't Save", "Cancel"
+                );
+            if (result == MessageBoxResult.Yes)
+            {   // yes, save
+                return DoSave(); // return true (can discard) if file was saved successfully
+            }
             if (result != MessageBoxResult.Yes)
-            {   // not ok, do not discard
-                return false;
+            {   // not dont save
+                return true; // can discard
             }
 
-            return DoSave(); // return true (can discard) if file was saved successfully
+            // cancel, default: cannot discard
+            return false; // cannot discard
         }
 
         private bool DoOpen()

@@ -25,6 +25,7 @@ namespace WpfMasterPassword.ViewModel
         public PropertyReadonlyModel<string> GeneratedPassword { get; private set; }
 
         public PropertyModel<SecureString> CurrentMasterPassword { get; private set; }
+        public PropertyReadonlyModel<bool> ResetMasterPassword { get; private set; } // we set this to true to allow resetting 
 
         // Commands
         public DelegateCommand Add { get; private set; }
@@ -47,6 +48,9 @@ namespace WpfMasterPassword.ViewModel
             GeneratedForSite = new PropertyReadonlyModel<string>();
             GeneratedPassword = new PropertyReadonlyModel<string>();
             CurrentMasterPassword = new PropertyModel<SecureString>();
+            ResetMasterPassword = new PropertyReadonlyModel<bool>();
+
+            CurrentMasterPassword.PropertyChanged += delegate { ResetMasterPassword.SetValue(false); };
 
             // Commands
             Add = new DelegateCommand(() => Sites.Add(new ConfigurationSiteViewModel()));
@@ -104,11 +108,21 @@ namespace WpfMasterPassword.ViewModel
             );
 
             SelectedItem.Value = Sites.FirstOrDefault();
+
+            ResetMasterPassword.SetValue(true);
         }
 
         public void Reset()
         {
-            
+            UserName.Value = null;
+            Sites.Clear();
+
+            GeneratedPassword.SetValue(string.Empty);
+            GeneratedForSite.SetValue(string.Empty);
+
+            // Notify Window to reset the entered passwd
+            ResetMasterPassword.SetValue(true);
+
         }
     }
 }

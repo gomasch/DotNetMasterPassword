@@ -6,15 +6,22 @@
              xmlns:local="clr-namespace:WpfMasterPassword.UserControls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=local:ConfigurationUserControl_DesignTimeData}"
-             d:DesignHeight="289.36" d:DesignWidth="600.995">
+             d:DesignHeight="289.36" d:DesignWidth="600.995"
+             >
+    <UserControl.Style>
+        <Style>
+            <!-- trick to move information about resetting the password trigger-->
+            <Setter Property="local:ConfigurationUserControl.ResetPassword" Value="{Binding Path=ResetMasterPassword.Value, Mode=OneWay}" />
+        </Style>
+    </UserControl.Style>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
             <Label>User Name:</Label>
-            <TextBox Text="{Binding UserName.Value}" Margin="5,0"/>
+            <TextBox Text="{Binding UserName.Value, UpdateSourceTrigger=PropertyChanged}" Margin="5,0"/>
             <Label>Master Password:</Label>
             <PasswordBox Name="passwordBox" PasswordChanged="passwordBox_PasswordChanged" Margin="5,0"/>
             <DockPanel LastChildFill="False">
-                <Button DockPanel.Dock="Right" Command="{Binding Add}" Margin="0,5,5,0" >
+                <Button DockPanel.Dock="Right" Command="{Binding Add}" Margin="0,5,5,0" Padding="2">
                     <StackPanel Orientation="Horizontal">
                         <Label>Add Site</Label>
                    <Path Data="M342.522,146.43L342.522,343.653 145.298,343.653 145.298,437.611 342.522,437.611 342.522,634.834 436.478,634.834 436.478,437.611 633.701,437.611 633.701,343.653 436.478,343.653 436.478,146.43z M389.517,0C604.233,0 779,174.729 779,389.517 779,604.27 604.233,779 389.517,779 174.693,779 0,604.27 0,389.517 0,174.729 174.693,0 389.517,0z" 
@@ -70,7 +77,7 @@
                     </StackPanel>
                 </Button>
                 <TextBox Text="{Binding GeneratedPassword.Value, Mode=OneWay}" ToolTip="Used: global user name, global master password, site name, site counter, site type of password"
-                         Margin="5,0" Height="20"/>
+                         Margin="5,0" Height="20" IsReadOnly="True"/>
             </DockPanel>
         </StackPanel>
 
