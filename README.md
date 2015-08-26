@@ -28,6 +28,9 @@ Some code was taken from other sources:
 * http://blogs.msdn.com/b/davidrickard/archive/2010/03/09/saving-window-size-and-location-in-wpf-and-winforms.aspx for window placement
 * https://github.com/evanwon/WPFCustomMessageBox for custom message box
 
+Screenshots
+[![Windows GUI Screenshot](https://github.com/gomasch/DotNetMasterPassword/WpfMasterPassword/Screenshot.png)](#Screenshot Windows GUI)
+
 LICENSE<br>
 MIT License<br>
 http://opensource.org/licenses/MIT
