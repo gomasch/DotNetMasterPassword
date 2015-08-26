@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,16 +31,26 @@ namespace WpfMasterPassword
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Settings.Default.MainWindowPlacement = this.GetPlacement();
-
-            // inform about closing idea (allow viewmodel to cancel closing)
-            var viewModel = DataContext as DocumendViewModel;
-            if (null != viewModel)
+            try
             {
-                viewModel.OnClose(e);
-            }
+                // window placement
+                Settings.Default.MainWindowPlacement = this.GetPlacement();
 
-            Settings.Default.Save();
+                // inform about closing idea (allow viewmodel to cancel closing)
+                var viewModel = DataContext as DocumendViewModel;
+                if (null != viewModel)
+                {
+                    viewModel.OnClose(e);
+                }
+
+                // save settings (we have seen problems here)
+                Settings.Default.Save();
+            }
+            catch (Exception ex)
+            {
+                // suppress problem, don't interrupt the closing for that
+                Trace.WriteLine(ex.ToString());
+            }            
         }
 
         protected override void OnSourceInitialized(EventArgs e)
