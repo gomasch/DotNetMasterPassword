@@ -11,8 +11,8 @@ Provided that the apps use the same algorithm and the same base data (your globa
 the passwords can be dynamically recreated everywhere. If a site is hacked then only that one specific password is compromised, not your other passwords. This 
 rests on a specific cryptographic one-way-algorithm that makes it very hard to guess the master password from the site specific password. This is a brilliant concept IMO.
 
-Project Overview (all .NET):
-* MonoMasterPasswordLib - contains basic algorithm, see http://masterpasswordapp.com/algorithm.html for detailed description of the algorithm.
+Project Overview:
+* MasterPasswordLib - contains basic algorithm, see http://masterpasswordapp.com/algorithm.html for detailed description of the algorithm (.NET 4.5 / Mono 4.0.0).
 * ConsoleMasterPassword - command line client (.NET 4.5)
 * WpfMasterPassword - simple WPF Windows App (.NET 4.5)
 * MonoMacMasterPassword - simplistic Mac App built with Xamarin Studio and XCode (Mono 4.0.0).
