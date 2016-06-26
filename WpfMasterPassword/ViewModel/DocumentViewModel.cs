@@ -15,10 +15,9 @@ using WpfMasterPassword.Dialogs;
 
 namespace WpfMasterPassword.ViewModel
 {
-    public class DocumendViewModel : BindableBase
+    public class DocumentViewModel : BindableBase
     {
         public PropertyDelegateReadonlyModel<string> WindowTitle { get; private set; }
-
 
         public PropertyReadonlyModel<bool> HasChanges { get; private set; }
         public PropertyReadonlyModel<bool> FilePathValid { get; private set; }
@@ -34,7 +33,7 @@ namespace WpfMasterPassword.ViewModel
         const string FileFilter = "MasterPassword file (*.xml)|*.xml|All files (*.*)|*.*";
         const string FileNameNew = "<new>";
 
-        public DocumendViewModel()
+        public DocumentViewModel()
         {
             WindowTitle = new PropertyDelegateReadonlyModel<string>(() => ".NET Master Password - " + FilePathName.Value + " " + (HasChanges.Value ? "*" : ""));
             HasChanges = new PropertyReadonlyModel<bool>();
