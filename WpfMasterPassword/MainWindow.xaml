@@ -10,7 +10,7 @@
         Title="{Binding WindowTitle.Value}"
         Height="515" Width="662" WindowStartupLocation="CenterScreen" Icon="Icon.ico" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop">
     <Window.DataContext>
-        <vm:DocumendViewModel/>
+        <vm:DocumentViewModel/>
     </Window.DataContext>
     <Window.Resources>
         <!-- <Style BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" TargetType="Button"></Style> -->

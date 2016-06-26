@@ -37,7 +37,7 @@ namespace WpfMasterPassword
                 Settings.Default.MainWindowPlacement = this.GetPlacement();
 
                 // inform about closing idea (allow viewmodel to cancel closing)
-                var viewModel = DataContext as DocumendViewModel;
+                var viewModel = DataContext as DocumentViewModel;
                 if (null != viewModel)
                 {
                     viewModel.OnClose(e);
@@ -66,7 +66,7 @@ namespace WpfMasterPassword
                 // Note that you can have more than one file.
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                var viewModel = DataContext as DocumendViewModel;
+                var viewModel = DataContext as DocumentViewModel;
                 if (null != viewModel)
                 {
                     viewModel.OpenFileFromDrop(files[0]);
@@ -75,7 +75,7 @@ namespace WpfMasterPassword
         }
     }
 
-    public class MainWindow_DesignTimeData : DocumendViewModel
+    public class MainWindow_DesignTimeData : DocumentViewModel
     {
         public MainWindow_DesignTimeData()
         {
