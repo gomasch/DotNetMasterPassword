@@ -21,27 +21,79 @@
             <Label>Master Password:</Label>
             <PasswordBox Name="passwordBox" PasswordChanged="passwordBox_PasswordChanged" Margin="5,0"/>
             <DockPanel LastChildFill="False">
+                <Button DockPanel.Dock="Right" Command="{Binding RemoveSelected}" Margin="0,5,5,0" Padding="2">
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Remove Site</Label>
+                        <Path Data="M469.314,171.95L469.314,675.277 575.603,675.277 575.603,171.95z M203.347,171.95L203.347,675.277 309.686,675.277 309.686,171.95z M211.071,0L567.926,0 567.926,83.6537 779,83.6537 779,171.95 714.002,171.95 714.002,779 64.9982,779 64.9982,171.95 0,171.95 0,83.6537 211.071,83.6537z" 
+                                      Stretch="Uniform" Fill="#FF7B6DAB" Width="16" Height="16" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5">
+                            <Path.RenderTransform>
+                                <TransformGroup>
+                                    <TransformGroup.Children>
+                                        <RotateTransform Angle="0" />
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    </TransformGroup.Children>
+                                </TransformGroup>
+                            </Path.RenderTransform>
+                        </Path>
+                    </StackPanel>
+                </Button>
                 <Button DockPanel.Dock="Right" Command="{Binding Add}" Margin="0,5,5,0" Padding="2">
                     <StackPanel Orientation="Horizontal">
                         <Label>Add Site</Label>
-                   <Path Data="M342.522,146.43L342.522,343.653 145.298,343.653 145.298,437.611 342.522,437.611 342.522,634.834 436.478,634.834 436.478,437.611 633.701,437.611 633.701,343.653 436.478,343.653 436.478,146.43z M389.517,0C604.233,0 779,174.729 779,389.517 779,604.27 604.233,779 389.517,779 174.693,779 0,604.27 0,389.517 0,174.729 174.693,0 389.517,0z" 
+                        <Path Data="M342.522,146.43L342.522,343.653 145.298,343.653 145.298,437.611 342.522,437.611 342.522,634.834 436.478,634.834 436.478,437.611 633.701,437.611 633.701,343.653 436.478,343.653 436.478,146.43z M389.517,0C604.233,0 779,174.729 779,389.517 779,604.27 604.233,779 389.517,779 174.693,779 0,604.27 0,389.517 0,174.729 174.693,0 389.517,0z" 
                          Stretch="Uniform" Fill="#FF7B6DAB" Width="22" Height="22" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" ToolTip="Add Site">
-                        <Path.RenderTransform>
-                            <TransformGroup>
-                                <TransformGroup.Children>
-                                    <RotateTransform Angle="0" />
-                                    <ScaleTransform ScaleX="1" ScaleY="1" />
-                                </TransformGroup.Children>
-                            </TransformGroup>
-                        </Path.RenderTransform>
-                    </Path>
+                            <Path.RenderTransform>
+                                <TransformGroup>
+                                    <TransformGroup.Children>
+                                        <RotateTransform Angle="0" />
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    </TransformGroup.Children>
+                                </TransformGroup>
+                            </Path.RenderTransform>
+                        </Path>
                     </StackPanel>
                 </Button>
                 <Label VerticalAlignment="Center">Sites:</Label>
+                <Label VerticalAlignment="Center" Content="{Binding Sites.Count}"/>
             </DockPanel>
         </StackPanel>
         <StackPanel DockPanel.Dock="Bottom">
             <DockPanel>
+                <Label Content="Generated Site Password:" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <Label Content="{Binding GeneratedForSite.Value}" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+            </DockPanel>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Command="{Binding CopyLoginToClipBoard}" Margin="3">
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Copy Login</Label>
+                        <Path Data="M31.687001,23.116L31.687001,31.394341C31.687001,31.394341,31.526705,36.832023,25.52624,36.359949L18.506,36.388395 18.506,49.587002 18.506001,54.153999 18.506,59.292614C18.506,59.812107,18.929218,60.233997,19.448625,60.233997L45.808704,60.233997C46.326101,60.233997,46.749998,59.812107,46.749998,59.292614L46.749998,24.057384C46.749998,23.539322,46.326101,23.116,45.808704,23.116z M20.552001,4.5669994L20.552001,14.60861C20.552001,14.60861,20.358706,21.203206,13.080177,20.631915L4.565999,20.665694 4.565999,48.4459C4.566,49.076302,5.0797424,49.587002,5.7100554,49.587002L14.742001,49.587002 14.742001,35.400336 18.161097,31.792807 18.166127,31.774705 26.474542,22.972 26.521163,22.972 29.953973,19.349999 38.822001,19.349999 38.822001,5.7076302C38.822001,5.0806808,38.309198,4.5669994,37.680792,4.5669994z M18.449971,0L37.680651,0C40.833681,0,43.391001,2.5571156,43.391001,5.707489L43.391001,19.349999 45.80884,19.349999C48.409018,19.35,50.517,21.458894,50.517,24.05704L50.517,59.292992C50.517,61.893593,48.409018,64,45.80884,64L19.448812,64C16.849223,64,14.742,61.893593,14.742001,59.292992L14.742001,54.153999 5.709774,54.153999C2.555994,54.153999,0,51.599316,0,48.445534L0,19.465691 4.1473293,15.090039 4.1532602,15.068708 14.229262,4.3929996 14.286199,4.3929996z" Stretch="Uniform" Fill="#FF7B6DAB" Width="22" Height="22" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5">
+                            <Path.RenderTransform>
+                                <TransformGroup>
+                                    <TransformGroup.Children>
+                                        <RotateTransform Angle="0" />
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    </TransformGroup.Children>
+                                </TransformGroup>
+                            </Path.RenderTransform>
+                        </Path>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding CopyToClipBoard}" DockPanel.Dock="Right" MinWidth="200" Margin="3">
+                    <StackPanel Orientation="Horizontal">
+                        <Label VerticalAlignment="Center">Copy Password To Clipboard</Label>
+                        <Path Data="M31.687001,23.116L31.687001,31.394341C31.687001,31.394341,31.526705,36.832023,25.52624,36.359949L18.506,36.388395 18.506,49.587002 18.506001,54.153999 18.506,59.292614C18.506,59.812107,18.929218,60.233997,19.448625,60.233997L45.808704,60.233997C46.326101,60.233997,46.749998,59.812107,46.749998,59.292614L46.749998,24.057384C46.749998,23.539322,46.326101,23.116,45.808704,23.116z M20.552001,4.5669994L20.552001,14.60861C20.552001,14.60861,20.358706,21.203206,13.080177,20.631915L4.565999,20.665694 4.565999,48.4459C4.566,49.076302,5.0797424,49.587002,5.7100554,49.587002L14.742001,49.587002 14.742001,35.400336 18.161097,31.792807 18.166127,31.774705 26.474542,22.972 26.521163,22.972 29.953973,19.349999 38.822001,19.349999 38.822001,5.7076302C38.822001,5.0806808,38.309198,4.5669994,37.680792,4.5669994z M18.449971,0L37.680651,0C40.833681,0,43.391001,2.5571156,43.391001,5.707489L43.391001,19.349999 45.80884,19.349999C48.409018,19.35,50.517,21.458894,50.517,24.05704L50.517,59.292992C50.517,61.893593,48.409018,64,45.80884,64L19.448812,64C16.849223,64,14.742,61.893593,14.742001,59.292992L14.742001,54.153999 5.709774,54.153999C2.555994,54.153999,0,51.599316,0,48.445534L0,19.465691 4.1473293,15.090039 4.1532602,15.068708 14.229262,4.3929996 14.286199,4.3929996z" Stretch="Uniform" Fill="#FF7B6DAB" Width="22" Height="22" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5">
+                            <Path.RenderTransform>
+                                <TransformGroup>
+                                    <TransformGroup.Children>
+                                        <RotateTransform Angle="0" />
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    </TransformGroup.Children>
+                                </TransformGroup>
+                            </Path.RenderTransform>
+                        </Path>
+                    </StackPanel>
+                </Button>
                 <Button Command="{Binding GeneratePassword}" DockPanel.Dock="Right" MinWidth="140" Margin="3">
                     <StackPanel Orientation="Horizontal">
                         <Label VerticalAlignment="Center">Generate Password</Label>
@@ -57,37 +109,23 @@
                         </Path>
                     </StackPanel>
                 </Button>
-                <Label Content="{Binding GeneratedForSite.Value}" DockPanel.Dock="Right" VerticalAlignment="Center"/>
-                <Label Content="Generated Password:" VerticalAlignment="Center"/>
-            </DockPanel>
-            <DockPanel>
-                <Button Command="{Binding CopyToClipBoard}" DockPanel.Dock="Right" MinWidth="140" Margin="3">
-                    <StackPanel Orientation="Horizontal">
-                        <Label VerticalAlignment="Center">Copy To Clipboard</Label>
-                        <Path Data="M31.687001,23.116L31.687001,31.394341C31.687001,31.394341,31.526705,36.832023,25.52624,36.359949L18.506,36.388395 18.506,49.587002 18.506001,54.153999 18.506,59.292614C18.506,59.812107,18.929218,60.233997,19.448625,60.233997L45.808704,60.233997C46.326101,60.233997,46.749998,59.812107,46.749998,59.292614L46.749998,24.057384C46.749998,23.539322,46.326101,23.116,45.808704,23.116z M20.552001,4.5669994L20.552001,14.60861C20.552001,14.60861,20.358706,21.203206,13.080177,20.631915L4.565999,20.665694 4.565999,48.4459C4.566,49.076302,5.0797424,49.587002,5.7100554,49.587002L14.742001,49.587002 14.742001,35.400336 18.161097,31.792807 18.166127,31.774705 26.474542,22.972 26.521163,22.972 29.953973,19.349999 38.822001,19.349999 38.822001,5.7076302C38.822001,5.0806808,38.309198,4.5669994,37.680792,4.5669994z M18.449971,0L37.680651,0C40.833681,0,43.391001,2.5571156,43.391001,5.707489L43.391001,19.349999 45.80884,19.349999C48.409018,19.35,50.517,21.458894,50.517,24.05704L50.517,59.292992C50.517,61.893593,48.409018,64,45.80884,64L19.448812,64C16.849223,64,14.742,61.893593,14.742001,59.292992L14.742001,54.153999 5.709774,54.153999C2.555994,54.153999,0,51.599316,0,48.445534L0,19.465691 4.1473293,15.090039 4.1532602,15.068708 14.229262,4.3929996 14.286199,4.3929996z" Stretch="Uniform" Fill="#FF7B6DAB" Width="22" Height="22" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5">
-                            <Path.RenderTransform>
-                                <TransformGroup>
-                                    <TransformGroup.Children>
-                                        <RotateTransform Angle="0" />
-                                        <ScaleTransform ScaleX="1" ScaleY="1" />
-                                    </TransformGroup.Children>
-                                </TransformGroup>
-                            </Path.RenderTransform>
-                        </Path>
-                    </StackPanel>
-                </Button>
+
                 <TextBox Text="{Binding GeneratedPassword.Value, Mode=OneWay}" ToolTip="Used: global user name, global master password, site name, site counter, site type of password"
                          Margin="5,0" Height="20" IsReadOnly="True"/>
+            </DockPanel>
+            <DockPanel>
+                
             </DockPanel>
         </StackPanel>
 
         <DataGrid Margin="5,0"
                   ItemsSource="{Binding Sites}" AutoGenerateColumns="False" GridLinesVisibility="None" AlternatingRowBackground="Transparent" RowBackground="LightGray" 
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeRows="False" CanUserSortColumns="False"
-                  SelectedItem="{Binding Path=SelectedItem.Value, Mode=TwoWay}" RowDetailsVisibilityMode="Visible" BorderBrush="Transparent" RowHeaderWidth="0"
+                  SelectedItem="{Binding Path=SelectedItem.Value, Mode=TwoWay}" RowDetailsVisibilityMode="Visible" BorderBrush="Transparent" RowHeaderWidth="0" SelectionChanged="DataGrid_SelectionChanged"
                   >
             <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#D7CCFF"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{x:Static SystemColors.HighlightColor}"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="{x:Static SystemColors.HighlightTextColor}"/>
             </DataGrid.Resources>
             <DataGrid.Columns>
                 <!-- site -->
@@ -112,30 +150,8 @@
                 <DataGridTextColumn Header="Counter" Binding="{Binding Path=Counter.Value}" Width="60" CanUserSort="False"/>
 
                 <!-- login -->
-                <DataGridTextColumn Header="Login (not used)" Binding="{Binding Path=Login.Value}"/>
+                <DataGridTextColumn Header="Login (not used for pw)" Binding="{Binding Path=Login.Value}"/>
 
-                <!-- remove button -->
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button ToolTip="Remove" CommandParameter="{Binding}" Command="{Binding DataContext.Remove, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"
-                                    >
-                                <Path Data="M469.314,171.95L469.314,675.277 575.603,675.277 575.603,171.95z M203.347,171.95L203.347,675.277 309.686,675.277 309.686,171.95z M211.071,0L567.926,0 567.926,83.6537 779,83.6537 779,171.95 714.002,171.95 714.002,779 64.9982,779 64.9982,171.95 0,171.95 0,83.6537 211.071,83.6537z" 
-                                      Stretch="Uniform" Fill="#FF7B6DAB" Width="16" Height="16" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5">
-                                    <Path.RenderTransform>
-                                        <TransformGroup>
-                                            <TransformGroup.Children>
-                                                <RotateTransform Angle="0" />
-                                                <ScaleTransform ScaleX="1" ScaleY="1" />
-                                            </TransformGroup.Children>
-                                        </TransformGroup>
-                                    </Path.RenderTransform>
-                                </Path>
-                            </Button>
-
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

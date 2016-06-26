@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using WpfMasterPassword.Common;
+using WpfMasterPassword.Dialogs;
 
 namespace WpfMasterPassword.ViewModel
 {
@@ -29,10 +30,11 @@ namespace WpfMasterPassword.ViewModel
 
         // Commands
         public DelegateCommand Add { get; private set; }
-        public DelegateCommand<ConfigurationSiteViewModel> Remove { get; private set; }
+        public DelegateCommand RemoveSelected { get; private set; }
 
         public DelegateCommand GeneratePassword { get; private set; }
         public DelegateCommand CopyToClipBoard { get; private set; }
+        public DelegateCommand CopyLoginToClipBoard { get; private set; }
 
         // Change Detection
         public GenericChangeDetection DetectChanges { get; private set; }
@@ -53,15 +55,42 @@ namespace WpfMasterPassword.ViewModel
             CurrentMasterPassword.PropertyChanged += delegate { ResetMasterPassword.SetValue(false); };
 
             // Commands
-            Add = new DelegateCommand(() => Sites.Add(new ConfigurationSiteViewModel()));
-            Remove = new DelegateCommand<ConfigurationSiteViewModel>(item => Sites.Remove(item));
+            Add = new DelegateCommand(() => PerformAdd());
+            RemoveSelected = new DelegateCommand(() => { if (CanRemove(SelectedItem.Value)) Sites.Remove(SelectedItem.Value); }, () => SelectedItem.Value != null);
             GeneratePassword = new DelegateCommand(DoGeneratePassword, () => CurrentMasterPassword.Value != null && SelectedItem.Value != null);
             CopyToClipBoard = new DelegateCommand(() => Clipboard.SetText(GeneratedPassword.Value), () => !string.IsNullOrEmpty(GeneratedPassword.Value) && CurrentMasterPassword.Value != null);
+            CopyLoginToClipBoard = new DelegateCommand(() => Clipboard.SetText(SelectedItem.Value.Login.Value), () => SelectedItem.Value != null);
 
             // Change detection
             DetectChanges = new GenericChangeDetection();
             DetectChanges.AddINotifyPropertyChanged(UserName);
             DetectChanges.AddCollectionOfIDetectChanges(Sites, item => item.DetectChanges);
+        }
+
+        private void PerformAdd()
+        {
+            var newItem = new ConfigurationSiteViewModel();
+            Sites.Add(newItem);
+            SelectedItem.Value = newItem;
+            // view wants to trigger this, let's hope it does
+            // grid.UpdateLayout();
+            // grid.ScrollIntoView(grid.SelectedItem, null);
+        }
+
+        private bool CanRemove(ConfigurationSiteViewModel value)
+        {
+            // ask user
+            var result = CustomMessageBox.ShowYesNoCancel(
+                "Do you want to remote site '" + value.SiteName.Value + "' from your list?", ".NET Master Password",
+                "Remove", "Don't Remove", "Cancel"
+                );
+            if (result == MessageBoxResult.Yes)
+            {   // yes, remove
+                return true; // can remove
+            }
+
+            // cancel, default: cannot remove
+            return false;
         }
 
         private void DoGeneratePassword()
@@ -97,15 +126,15 @@ namespace WpfMasterPassword.ViewModel
             UserName.Value = config.UserName;
 
             SynchronizeLists.Sync(Sites, config.Sites, siteXml =>
-            {
-                var site = new ConfigurationSiteViewModel();
-                site.Login.Value = siteXml.Login;
-                site.SiteName.Value = siteXml.SiteName;
-                site.Counter.Value = siteXml.Counter;
-                site.TypeOfPassword.Value = siteXml.Type;
-                return site;
-            }
-            );
+                {
+                    var site = new ConfigurationSiteViewModel();
+                    site.Login.Value = siteXml.Login;
+                    site.SiteName.Value = siteXml.SiteName;
+                    site.Counter.Value = siteXml.Counter;
+                    site.TypeOfPassword.Value = siteXml.Type;
+                    return site;
+                }
+                );
 
             SelectedItem.Value = Sites.FirstOrDefault();
 
