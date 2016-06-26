@@ -154,7 +154,9 @@ namespace WpfMasterPassword.Common
 
             private void Collection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
             {
-                Sync();
+                Sync(); // hook into changes
+
+                parent.OnDataChanged(); // list changed, tell him
             }
 
             private void Sync()
