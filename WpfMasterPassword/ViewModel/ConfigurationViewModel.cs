@@ -28,6 +28,8 @@ namespace WpfMasterPassword.ViewModel
         public PropertyModel<SecureString> CurrentMasterPassword { get; private set; }
         public PropertyReadonlyModel<bool> ResetMasterPassword { get; private set; } // we set this to true to allow resetting 
 
+        public PropertyReadonlyModel<string> LastClipboardAction { get; private set; } // show what we did last time "copied login for ... to clipboard"
+
         // Commands
         public DelegateCommand Add { get; private set; }
         public DelegateCommand RemoveSelected { get; private set; }
@@ -52,19 +54,33 @@ namespace WpfMasterPassword.ViewModel
             CurrentMasterPassword = new PropertyModel<SecureString>();
             ResetMasterPassword = new PropertyReadonlyModel<bool>();
 
+            LastClipboardAction = new PropertyReadonlyModel<string>();
+
             CurrentMasterPassword.PropertyChanged += delegate { ResetMasterPassword.SetValue(false); };
 
             // Commands
             Add = new DelegateCommand(() => PerformAdd());
             RemoveSelected = new DelegateCommand(() => { if (CanRemove(SelectedItem.Value)) Sites.Remove(SelectedItem.Value); }, () => SelectedItem.Value != null);
             GeneratePassword = new DelegateCommand(DoGeneratePassword, () => CurrentMasterPassword.Value != null && SelectedItem.Value != null);
-            CopyToClipBoard = new DelegateCommand(() => Clipboard.SetText(GeneratedPassword.Value), () => !string.IsNullOrEmpty(GeneratedPassword.Value) && CurrentMasterPassword.Value != null);
-            CopyLoginToClipBoard = new DelegateCommand(() => Clipboard.SetText(SelectedItem.Value.Login.Value), () => SelectedItem.Value != null);
+            CopyToClipBoard = new DelegateCommand(DoCopyPassToClipboard, () => !string.IsNullOrEmpty(GeneratedPassword.Value) && CurrentMasterPassword.Value != null);
+            CopyLoginToClipBoard = new DelegateCommand(DoCopyLoginToClipboard, () => SelectedItem.Value != null);
 
             // Change detection
             DetectChanges = new GenericChangeDetection();
             DetectChanges.AddINotifyPropertyChanged(UserName);
             DetectChanges.AddCollectionOfIDetectChanges(Sites, item => item.DetectChanges);
+        }
+
+        private void DoCopyLoginToClipboard()
+        {
+            Clipboard.SetText(SelectedItem.Value.Login.Value);
+            LastClipboardAction.SetValue("login for '" + SelectedItem.Value.SiteName.Value + "' copied");
+        }
+
+        private void DoCopyPassToClipboard()
+        {
+            Clipboard.SetText(GeneratedPassword.Value);
+            LastClipboardAction.SetValue("password for '" + GeneratedForSite.Value + "' copied");
         }
 
         private void PerformAdd()
@@ -99,7 +115,8 @@ namespace WpfMasterPassword.ViewModel
 
             string pw = new System.Net.NetworkCredential(string.Empty, CurrentMasterPassword.Value).Password;
             var masterkey = Algorithm.CalcMasterKey(UserName.Value, pw);
-            var templateSeed = Algorithm.CalcTemplateSeed(masterkey, selectedEntry.SiteName.Value, selectedEntry.Counter.Value);            GeneratedPassword.SetValue(Algorithm.CalcPassword(templateSeed, selectedEntry.TypeOfPassword.Value));
+            var templateSeed = Algorithm.CalcTemplateSeed(masterkey, selectedEntry.SiteName.Value, selectedEntry.Counter.Value);
+            GeneratedPassword.SetValue(Algorithm.CalcPassword(templateSeed, selectedEntry.TypeOfPassword.Value));
             GeneratedForSite.SetValue(selectedEntry.SiteName.Value);
         }
 

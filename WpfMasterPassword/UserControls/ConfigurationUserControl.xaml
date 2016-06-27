@@ -61,6 +61,7 @@
             <DockPanel>
                 <Label Content="Generated Site Password:" DockPanel.Dock="Left" VerticalAlignment="Center"/>
                 <Label Content="{Binding GeneratedForSite.Value}" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <Label Content="{Binding LastClipboardAction.Value}" VerticalAlignment="Center" HorizontalContentAlignment="Right" Name="lastActionLabel"/>
             </DockPanel>
             <DockPanel>
                 <Button DockPanel.Dock="Right" Command="{Binding CopyLoginToClipBoard}" Margin="3">
@@ -129,7 +130,7 @@
             </DataGrid.Resources>
             <DataGrid.Columns>
                 <!-- site -->
-                <DataGridTextColumn Header="Site Name" Binding="{Binding Path=SiteName.Value}" Width="Auto" MinWidth="80" />
+                <DataGridTextColumn Header="Site Name" Binding="{Binding Path=SiteName.Value}" Width="*" MinWidth="80" />
 
                 <!-- pw type -->
                 <DataGridComboBoxColumn Header="Type" DisplayMemberPath="Item2" SelectedValuePath="Item1" 
@@ -150,7 +151,7 @@
                 <DataGridTextColumn Header="Counter" Binding="{Binding Path=Counter.Value}" Width="60" CanUserSort="False"/>
 
                 <!-- login -->
-                <DataGridTextColumn Header="Login (not used for pw)" Binding="{Binding Path=Login.Value}"/>
+                <DataGridTextColumn Header="Login (Not Used for PW)" Binding="{Binding Path=Login.Value}"/>
 
             </DataGrid.Columns>
         </DataGrid>
