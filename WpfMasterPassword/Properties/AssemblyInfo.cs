@@ -16,8 +16,8 @@ using System.Windows;
 [assembly: ComVisible(false)]
 // not defined, not needed: [assembly: Guid()]
 
-// defined globally: [assembly: AssemblyVersion()]
-// defined globally: [assembly: AssemblyFileVersion()]
+[assembly: AssemblyVersion("1.02.01")]
+[assembly: AssemblyFileVersion("1.02.01")]
 // defined globally: [assembly: AssemblyInformationalVersion()] // "Product Version"
 
 
