@@ -36,10 +36,21 @@ namespace MasterPassword.Model
         /// <param name="counter">initial counter value</param>
         public SiteEntry(string name, int counter)
         {
-            this.SiteName = name;
-            this.Login = string.Empty;
-            this.Counter = counter;
-            this.Type = PasswordType.LongPassword;
+            SiteName = name;
+            Login = string.Empty;
+            Counter = counter;
+            Type = PasswordType.LongPassword;
+        }
+
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        public SiteEntry(SiteEntry copyFrom)
+        {
+            SiteName = copyFrom.SiteName;
+            Login = copyFrom.Login;
+            Counter = copyFrom.Counter;
+            Type = copyFrom.Type;
         }
 
         /// <summary>
@@ -51,10 +62,10 @@ namespace MasterPassword.Model
         /// <param name="type">initial type</param>
         public SiteEntry(string siteName, int counter, string login, PasswordType type)
         {
-            this.SiteName = siteName;
-            this.Login = login;
-            this.Counter = counter;
-            this.Type = type;
+            SiteName = siteName;
+            Login = login;
+            Counter = counter;
+            Type = type;
         }
    }
 }
