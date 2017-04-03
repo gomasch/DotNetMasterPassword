@@ -21,6 +21,7 @@ namespace WpfMasterPassword.ViewModel
         public ObservableCollection<ConfigurationSiteViewModel> Sites { get; private set; }
 
         public PropertyModel<ConfigurationSiteViewModel> SelectedItem { get; private set; }
+        public PropertyReadonlyModel<ConfigurationSiteViewModel> SelectedItemScrollTo { get; private set; }
 
         public PropertyReadonlyModel<string> GeneratedForSite { get; private set; }
         public PropertyReadonlyModel<string> GeneratedPassword { get; private set; }
@@ -48,6 +49,7 @@ namespace WpfMasterPassword.ViewModel
             Sites = new ObservableCollection<ConfigurationSiteViewModel>();
 
             SelectedItem = new PropertyModel<ConfigurationSiteViewModel>();
+            SelectedItemScrollTo = new PropertyReadonlyModel<ConfigurationSiteViewModel>(); // helper to influence grid selection
 
             GeneratedForSite = new PropertyReadonlyModel<string>();
             GeneratedPassword = new PropertyReadonlyModel<string>();
@@ -88,7 +90,10 @@ namespace WpfMasterPassword.ViewModel
             var newItem = new ConfigurationSiteViewModel();
             Sites.Add(newItem);
             SelectedItem.Value = newItem;
-            // view wants to trigger this, let's hope it does
+
+            // let's do a trick with a 2nd property to make the grid scroll to the selected item:
+            SelectedItemScrollTo.SetValue(newItem);
+            // view wants to do this, let's hope it does (by binding DataGridSelectingItem to this)
             // grid.UpdateLayout();
             // grid.ScrollIntoView(grid.SelectedItem, null);
         }

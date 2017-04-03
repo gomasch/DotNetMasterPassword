@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfMasterPassword.UserControls"
+             xmlns:common="clr-namespace:WpfMasterPassword.Common"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=local:ConfigurationUserControl_DesignTimeData}"
              d:DesignHeight="289.36" d:DesignWidth="600.995"
@@ -122,7 +123,9 @@
         <DataGrid Margin="5,0"
                   ItemsSource="{Binding Sites}" AutoGenerateColumns="False" GridLinesVisibility="None" AlternatingRowBackground="Transparent" RowBackground="LightGray" 
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeRows="False" CanUserSortColumns="False"
-                  SelectedItem="{Binding Path=SelectedItem.Value, Mode=TwoWay}" RowDetailsVisibilityMode="Visible" BorderBrush="Transparent" RowHeaderWidth="0" SelectionChanged="DataGrid_SelectionChanged"
+                  SelectedItem="{Binding Path=SelectedItem.Value, Mode=TwoWay}" 
+                  common:DataGridSelectingItem.SelectingItem="{Binding Path=SelectedItemScrollTo.Value}"
+                  RowDetailsVisibilityMode="Visible" BorderBrush="Transparent" RowHeaderWidth="0"
                   >
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{x:Static SystemColors.HighlightColor}"/>

@@ -55,27 +55,6 @@ namespace WpfMasterPassword.UserControls
                 viewModel.CurrentMasterPassword.Value = passwordBox.SecurePassword;
             }
         }
-
-        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // from http://stackoverflow.com/questions/4802450/datagrid-mvvm-scroll-into-view
-            // we want changed selections to be visible
-            if (sender is DataGrid)
-            {
-                DataGrid grid = (sender as DataGrid);
-                if (grid.SelectedItems.Count > 1) // <-------- Add row
-                    return; //<-------- Add row
-                if (grid.SelectedItem != null)
-                {
-                    grid.Dispatcher.BeginInvoke(new Action(delegate ()
-                    {
-                        grid.UpdateLayout();
-                        grid.ScrollIntoView(grid.SelectedItem, null);
-
-                    }));
-                }
-            }
-        }
     }
 
     public class ConfigurationUserControl_DesignTimeData : ConfigurationViewModel
