@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Linq;
 using System.IO;
 using MasterPassword.Core;
@@ -7,18 +6,34 @@ using System.Linq;
 
 namespace MasterPassword.Model
 {
+    /// <summary>
+    /// Represents the configuration for one user
+    /// </summary>
     public class Configuration
     {
+        /// <summary>
+        /// Name of the user, is used to generate the passwords for the sites
+        /// </summary>
         public string UserName { get; set;} 
 
+        /// <summary>
+        /// List of sites to generate passwords for
+        /// </summary>
         public List<SiteEntry> Sites { get; private set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public Configuration()
         {
             UserName = string.Empty;
             Sites = new List<SiteEntry>();
         }
 
+        /// <summary>
+        /// Load from a stream (typically: an XML file)
+        /// </summary>
+        /// <param name="s">open stream</param>
         public void Load(Stream s)
         {
             XDocument doc = XDocument.Load(s);
@@ -47,6 +62,10 @@ namespace MasterPassword.Model
             }
         }
 
+        /// <summary>
+        /// Save to a stream (typically: an XML file)
+        /// </summary>
+        /// <param name="s">open stream</param>
         public void Save(Stream s)
         {
             XDocument doc = new XDocument(new XElement("MasterPassword"));
@@ -69,12 +88,18 @@ namespace MasterPassword.Model
             doc.Save(s);
         }
 
+        /// <summary>
+        /// Clear sites and reset user name to default value.
+        /// </summary>
         public void Clear()
         {
             UserName = "User";
             Sites.Clear();
         }
 
+        /// <summary>
+        /// Helper structure for XML serialization: strings to use for the password types.
+        /// </summary>
         public static Dictionary<PasswordType, string> SerializePasswordTypeType = new Dictionary<PasswordType, string> 
         {
             { PasswordType.MaximumSecurityPassword, "MaximumSecurityPassword" },
