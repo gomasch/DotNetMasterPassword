@@ -118,7 +118,7 @@ namespace ConsoleMasterPassword
                     var secondFile = cmd.CurrentArg;
                     cmd.Next();
 
-                    string saveHere = null;
+                    string saveHere = null; // null means don't save merged result
                     if (cmd.IsValid)
                     {
                         if (cmd.CurrentArg != "-o")
@@ -126,6 +126,8 @@ namespace ConsoleMasterPassword
                             Console.WriteLine("unknown option " + cmd.CurrentArg);
                             return 1; // error
                         }
+                        cmd.Next();
+
                         if (!cmd.IsValid)
                         {
                             Console.WriteLine("missing second filename.");
@@ -133,13 +135,21 @@ namespace ConsoleMasterPassword
                         }
                         saveHere = cmd.CurrentArg;
                         cmd.Next();
+
+                        if (cmd.IsValid)
+                        {
+                            Console.WriteLine("unknown option " + cmd.CurrentArg);
+                            return 1; // error
+                        }
+
+                        if (string.Equals(saveHere, firstFile, StringComparison.InvariantCultureIgnoreCase) ||
+                            string.Equals(saveHere, secondFile, StringComparison.InvariantCultureIgnoreCase))
+                        {   // overwriting input files is not supported
+                            Console.WriteLine("Not merging: overwriting the input files is not supported." + cmd.CurrentArg);
+                            return 1; // error
+                        }
                     }
 
-                    if (cmd.IsValid)
-                    {
-                        Console.WriteLine("unknown option " + cmd.CurrentArg);
-                        return 1; // error
-                    }
 
                     // read both files
                     var firstConfig = new Configuration();
@@ -257,10 +267,12 @@ namespace ConsoleMasterPassword
                             }
                         }
 
-                        using (var file = File.OpenWrite(secondFile))
+                        using (var file = File.OpenWrite(saveHere))
                         {
                             merged.Save(file);
                         }
+                        Console.WriteLine("Saved merged " + merged.Sites.Count + " entries to '" + saveHere + "'" + 
+                            (conflicts.Count > 0 ? " including 2 x " + conflicts.Count + " entries for the conflicts" : "") + ".");
                     }
                     return 1;
                 }
