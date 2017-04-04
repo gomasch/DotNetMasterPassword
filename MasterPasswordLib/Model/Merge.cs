@@ -56,24 +56,26 @@ namespace MasterPassword.Model
             public enum Resolution
             {
                 /// <summary>
+                /// Both the same
+                /// </summary>
+                Identical,
+
+                /// <summary>
                 /// Use First
                 /// </summary>
-                UseFirst,
+                FirstNew,
+                FirstNewer,
 
                 /// <summary>
                 /// Use Second
                 /// </summary>
-                UseSecond,
+                SecondNew,
+                SecondNewer,
 
                 /// <summary>
                 /// Unclear which is better, please decide
                 /// </summary>
-                Conflict,
-
-                /// <summary>
-                /// Ignore both (i.e. do not create an entry)
-                /// </summary>
-                Ignore
+                Conflict
             }
 
             /// <summary>
@@ -90,26 +92,6 @@ namespace MasterPassword.Model
                 Second = second;
                 Which = which;
             }
-
-            /// <summary>
-            /// Will return null when not resolved
-            /// </summary>
-            /// <returns></returns>
-            public SiteEntry CreateResolved()
-            {
-                switch (Which)
-                {
-                    case Resolution.UseFirst:
-                        return First;
-                    case Resolution.UseSecond:
-                        return Second;
-                    case Resolution.Conflict:
-                    case Resolution.Ignore:
-                    default:
-                        // none
-                        return null;
-                }
-            }
         }
 
         /// <summary>
@@ -118,9 +100,12 @@ namespace MasterPassword.Model
         /// <param name="firstCfg">first ("our") configuration</param>
         /// <param name="secondCfg">second ("remote") configuration</param>
         /// <returns>merge result</returns>
-        public Result Perform(Configuration firstCfg, Configuration secondCfg)
+        public static Result Perform(Configuration firstCfg, Configuration secondCfg)
         {
-            if (firstCfg.UserName != secondCfg.UserName) throw new ArgumentException("Configurations not compatible, different user names");
+            if (firstCfg.UserName != secondCfg.UserName)
+            {
+                throw new ArgumentException("Configurations are not compatible, they use different user names ('" + firstCfg.UserName + "' != '" + secondCfg.UserName + "')");
+            }
 
             var result = new Result(firstCfg.UserName);
 
@@ -147,30 +132,34 @@ namespace MasterPassword.Model
                     }
                 }
 
-                if (null != second)
+                if (null == second)
                 {   // no partner? we're new in the original and just stay as is
-                    result.SitesMerged.Add(new MergedEntry(first, null, MergedEntry.Resolution.UseFirst));
+                    result.SitesMerged.Add(new MergedEntry(first, null, MergedEntry.Resolution.FirstNew));
+                }
+                else if (first.Type == second.Type && first.Counter == second.Counter && first.Login == second.Login && first.SiteName == second.SiteName && first.Type == second.Type)
+                {   // all the same
+                    result.SitesMerged.Add(new MergedEntry(first, second, MergedEntry.Resolution.Identical));
                 }
                 else
                 {   // potential conflict - exists in both sites
                     // bigger counter? that one wins
-                    if (first.Counter > second.Counter)
+                    if (first.Type == second.Type && first.Counter > second.Counter)
                     {
-                        result.SitesMerged.Add(new MergedEntry(first, second, MergedEntry.Resolution.UseFirst));
+                        result.SitesMerged.Add(new MergedEntry(first, second, MergedEntry.Resolution.FirstNewer));
                     }
-                    else if (first.Counter < second.Counter)
+                    else if (first.Type == second.Type && first.Counter < second.Counter)
                     {
-                        result.SitesMerged.Add(new MergedEntry(first, second, MergedEntry.Resolution.UseSecond));       
+                        result.SitesMerged.Add(new MergedEntry(first, second, MergedEntry.Resolution.SecondNewer));       
                     }
                     else
                     {   // same counter - conflict. try our best.
                         if (first.Type == second.Type && first.Login.StartsWith(second.Login))
                         {   // all the same but login is better in first
-                            result.SitesMerged.Add(new MergedEntry(first, second, MergedEntry.Resolution.UseFirst));
+                            result.SitesMerged.Add(new MergedEntry(first, second, MergedEntry.Resolution.FirstNewer));
                         }
                         else if (first.Type == second.Type && second.Login.StartsWith(first.Login))
                         {   // all the same but login is better in second
-                            result.SitesMerged.Add(new MergedEntry(first, second, MergedEntry.Resolution.UseSecond));
+                            result.SitesMerged.Add(new MergedEntry(first, second, MergedEntry.Resolution.SecondNewer));
                         }
                         else
                         {   // I have no idea
@@ -183,7 +172,7 @@ namespace MasterPassword.Model
             // remaining in right are new there
             foreach (var item in right)
             {
-                result.SitesMerged.Add(new MergedEntry(null, item, MergedEntry.Resolution.UseSecond));
+                result.SitesMerged.Add(new MergedEntry(null, item, MergedEntry.Resolution.SecondNew));
             }
 
             return result;

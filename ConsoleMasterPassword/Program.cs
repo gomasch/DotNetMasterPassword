@@ -1,6 +1,8 @@
 ﻿using MasterPassword.Core;
+using MasterPassword.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace ConsoleMasterPassword
@@ -35,23 +37,53 @@ namespace ConsoleMasterPassword
             }
         }
 
+        private static void PrintHelp()
+        {
+            Console.WriteLine(".NET Master Password Console");
+            Console.WriteLine("Generate derived passwords from a master password for a website.");
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  ConsoleMasterPassword -i");
+            Console.WriteLine("  ConsoleMasterPassword -u user -s sitename -t type -c counter -p password");
+            Console.WriteLine("  ConsoleMasterPassword -m cfg.xml cfg2.xml -o cfg3.xml");
+            Console.WriteLine("Example:");
+            Console.WriteLine("  ConsoleMasterPassword -u \"John Doe\" -s \"ebay.com\" - t long -c 1 -p \"a pwd\"");
+            Console.WriteLine("Commands:");
+            Console.WriteLine("  -?  help");
+            Console.WriteLine("  -i  use interactive mode to enter all data for one password");
+            Console.WriteLine("  -u  all properties to generate a password as options");
+            Console.WriteLine("    -u  specify user name");
+            Console.WriteLine("    -s  specify site name");
+            Console.WriteLine("    -t  specify type of password as an index value");
+            Console.WriteLine("        Available types of passwords:");
+            var types = GetPasswordTypes();
+            for (int i = 0; i < types.Length; i++)
+            {
+                Console.WriteLine("        " + i + "=" + types[i].ToString());
+            }
+            Console.WriteLine("    -c  specify counter for this site, optional, default is 1");
+            Console.WriteLine("    -p  specify masterpassword to derive the new password from");
+            Console.WriteLine("  -m  read two configuration files, merge them and print result");
+            Console.WriteLine("    -o  save merged result into new file, both entries for conflicts");
+        }
+
         private static int ParseCommands(string[] args)
         {
             // try to parse commands
             var cmd = new ParseArgs(args);
-
-            // configuration
-            string userName = null;
-            string siteName = null;
-            PasswordType? type = null;
-            int counter = 1;
-            string masterPassword = null;
 
             // set/update configuration based on commands
             while (cmd.IsValid)
             {
                 if (cmd.CurrentArg == "-i")
                 {   // interactive mode
+                    cmd.Next();
+
+                    if (cmd.IsValid)
+                    {
+                        Console.WriteLine("Unexpected argument for interactive mode.");
+                        return 1; // error
+                    }
+
                     InteractiveMode();
                     return 0; // do not continue
                 }
@@ -61,18 +93,245 @@ namespace ConsoleMasterPassword
                     return 0; // do not continue
                 }
                 else if (cmd.CurrentArg == "-u")
-                {   // user name
+                {   // user name for non-interactive mode
                     cmd.Next();
+
+                    return NonInteractiveMode(cmd);
+                }
+                else if (cmd.CurrentArg == "-m")
+                {   // merge mode
+                    cmd.Next();
+
                     if (!cmd.IsValid)
                     {
-                        Console.WriteLine("missing user name");
+                        Console.WriteLine("missing first filename.");
+                        return 1; // error
                     }
-                    else
+                    var firstFile = cmd.CurrentArg;
+                    cmd.Next();
+
+                    if (!cmd.IsValid)
                     {
-                        userName = cmd.CurrentArg;
+                        Console.WriteLine("missing second filename.");
+                        return 1; // error
                     }
+                    var secondFile = cmd.CurrentArg;
+                    cmd.Next();
+
+                    string saveHere = null;
+                    if (cmd.IsValid)
+                    {
+                        if (cmd.CurrentArg != "-o")
+                        {
+                            Console.WriteLine("unknown option " + cmd.CurrentArg);
+                            return 1; // error
+                        }
+                        if (!cmd.IsValid)
+                        {
+                            Console.WriteLine("missing second filename.");
+                            return 1; // error
+                        }
+                        saveHere = cmd.CurrentArg;
+                        cmd.Next();
+                    }
+
+                    if (cmd.IsValid)
+                    {
+                        Console.WriteLine("unknown option " + cmd.CurrentArg);
+                        return 1; // error
+                    }
+
+                    // read both files
+                    var firstConfig = new Configuration();
+                    using (var file = File.OpenRead(firstFile))
+                    {
+                        firstConfig.Load(file);
+                    }
+                    var secondConfig = new Configuration();
+                    using (var file = File.OpenRead(secondFile))
+                    {
+                        secondConfig.Load(file);
+                    }
+
+                    Console.WriteLine("Found entries: " + firstConfig.Sites.Count + " sites in 1st, " + secondConfig.Sites.Count + " sites in 2nd");
+
+                    // merge
+                    Merge.Result result;
+                    try
+                    {
+                        result = Merge.Perform(firstConfig, secondConfig);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Merge failed.");
+                        Console.WriteLine(ex.Message);                        
+                        return 1;
+                    }
+
+                    // print result
+                    var identical = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.Identical).ToList();
+                    if (identical.Count > 0)
+                    {
+                        Console.WriteLine("Same in both both configs: " + identical.Count + " entries");
+                        foreach (var item in identical)
+                        {
+                            Console.WriteLine("  site: " + item.First.SiteName + " (login='" + item.First.Login + "' c=" + item.First.Counter + " t=" + item.First.Type + ")");
+                        }
+                    }
+
+                    // Display overview
+                    var firstNew = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.FirstNew).ToList();
+                    if (firstNew.Count > 0)
+                    {
+                        Console.WriteLine("New in 1st (not found in 2nd): " + firstNew.Count + " entries");
+                        foreach (var item in firstNew)
+                        {
+                            Console.WriteLine("  site: " + item.First.SiteName + " (login='" + item.First.Login + "' c=" + item.First.Counter + " t=" + item.First.Type + ")");
+                        }
+                    }
+                    var firstNewer = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.FirstNewer).ToList();
+                    if (firstNewer.Count > 0)
+                    {
+                        Console.WriteLine("Newer in 1st (also found in 2nd but older): " + firstNewer.Count + " entries");
+                        foreach (var item in firstNewer)
+                        {
+                            Console.WriteLine("  site: " + item.First.SiteName + " (login='" + item.First.Login + "' c=" + item.First.Counter + " t=" + item.First.Type + ")");
+                        }
+                    }
+
+                    var secondNew = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.SecondNew).ToList();
+                    if (secondNew.Count > 0)
+                    {
+                        Console.WriteLine("New in 2nd (not found in 1st): " + secondNew.Count + " entries");
+                        foreach (var item in secondNew)
+                        {
+                            Console.WriteLine("  site: " + item.Second.SiteName + " (login='" + item.Second.Login + "' c=" + item.Second.Counter + " t=" + item.Second.Type + ")");
+                        }
+                    }
+                    var secondNewer = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.SecondNewer).ToList();
+                    if (secondNewer.Count > 0)
+                    {
+                        Console.WriteLine("Newer in 2nd (also found in 1st but older): " + secondNewer.Count + " entries");
+                        foreach (var item in secondNewer)
+                        {
+                            Console.WriteLine("  site: " + item.Second.SiteName + " (login='" + item.Second.Login + "' c=" + item.Second.Counter + " t=" + item.Second.Type + ")");
+                        }
+                    }
+                    var conflicts = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.Conflict).ToList();
+                    if (conflicts.Count > 0)
+                    {
+                        Console.WriteLine("Conflicts (site found in both and unclear which is 'better'): " + conflicts.Count + " entries (merged would contain both)");
+                        foreach (var item in conflicts)
+                        {
+                            Console.WriteLine("  site: " + item.First.SiteName);
+                            Console.WriteLine("   in 1st: login='" + item.First.Login + "' c=" + item.First.Counter + " t=" + item.First.Type + "");
+                            Console.WriteLine("   in 2nd: login='" + item.Second.Login + "' c=" + item.Second.Counter + " t=" + item.Second.Type + "");
+                        }
+                    }
+
+                    if (null != saveHere)
+                    {   // save
+                        var merged = new Configuration();
+
+                        merged.UserName = firstConfig.UserName;
+                        foreach (var item in result.SitesMerged)
+                        {
+                            switch (item.Which)
+                            {
+                                case Merge.MergedEntry.Resolution.Identical:
+                                case Merge.MergedEntry.Resolution.FirstNew:
+                                case Merge.MergedEntry.Resolution.FirstNewer:
+                                    merged.Sites.Add(new SiteEntry(item.First));
+                                    break;
+                                case Merge.MergedEntry.Resolution.SecondNew:
+                                case Merge.MergedEntry.Resolution.SecondNewer:
+                                    merged.Sites.Add(new SiteEntry(item.Second));
+                                    break;
+                                case Merge.MergedEntry.Resolution.Conflict:
+                                    // we include both
+                                    merged.Sites.Add(new SiteEntry(item.First));
+                                    merged.Sites.Add(new SiteEntry(item.Second));
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        using (var file = File.OpenWrite(secondFile))
+                        {
+                            merged.Save(file);
+                        }
+                    }
+                    return 1;
                 }
-                else if (cmd.CurrentArg == "-s")
+                else
+                {
+                    Console.WriteLine("unknown command " + cmd.CurrentArg);
+                    return 1;
+                }
+            }
+
+            Console.WriteLine("Missing command.");
+            PrintHelp();
+
+            return 1; // error
+        }
+
+        private static void InteractiveMode()
+        {
+            Console.WriteLine("Interactive mode. Use -? to show help for further options");
+
+            // Interactive mode
+            Console.Write("Enter user name you used:");
+            string userName = Console.ReadLine();
+
+            Console.Write("Enter site name to generate the password for:");
+            string siteName = Console.ReadLine();
+
+            Console.WriteLine(" Types of passwords:");
+            var types = GetPasswordTypes();
+            for (int i = 0; i < types.Length; i++)
+            {
+                Console.WriteLine(" [" + i + "] " + types[i].ToString());
+            }
+
+            Console.Write("Enter type of password (0..." + (types.Length - 1) + "):");
+            var typeAsString = Console.ReadLine();
+            var type = ExtractTypeFromString(types, typeAsString);
+
+            Console.Write("Enter counter for password (allows to change something, use 1 as default):");
+            int counter = int.Parse(Console.ReadLine());
+
+            Console.Write("Enter your master password to generate a password for this site:");
+            string masterPassword = ReadPassword('*');
+
+            // perform
+            Console.WriteLine("Generating password ...");
+
+            GeneratePassword(userName, siteName, type, counter, masterPassword);
+        }
+
+        private static int NonInteractiveMode(ParseArgs cmd)
+        {
+            // configuration
+            string userName = null;
+            string siteName = null;
+            PasswordType? type = null;
+            int counter = 1;
+            string masterPassword = null;
+
+            if (!cmd.IsValid)
+            {
+                Console.WriteLine("missing user name");
+            }
+            else
+            {
+                userName = cmd.CurrentArg;
+            }
+
+            while (cmd.IsValid)
+            {
+                if (cmd.CurrentArg == "-s")
                 {   // site name
                     cmd.Next();
                     if (!cmd.IsValid)
@@ -107,6 +366,11 @@ namespace ConsoleMasterPassword
                     {
                         masterPassword = cmd.CurrentArg;
                     }
+                }
+                else
+                {
+                    Console.WriteLine("unexpected argument " + cmd.CurrentArg);
+                    return 1;
                 }
 
                 cmd.Next();
@@ -145,65 +409,6 @@ namespace ConsoleMasterPassword
             // perform actual generation
             GeneratePassword(userName, siteName, type.Value, counter, masterPassword);
             return 0;
-        }
-
-        private static void PrintHelp()
-        {
-            Console.WriteLine(".NET Master Password Console");
-            Console.WriteLine("Generate derived passwords from a master password for a website.");
-            Console.WriteLine("Usage:");
-            Console.WriteLine("  ConsoleMasterPassword -i");
-            Console.WriteLine("  ConsoleMasterPassword -u user -s sitename -t type -c counter -p password");
-            Console.WriteLine("Example:");
-            Console.WriteLine("  ConsoleMasterPassword -u \"John Doe\" -s \"ebay.com\" - t long -c 1 -p \"a pwd\"");
-            Console.WriteLine("Options:");
-            Console.WriteLine("  -?  help");
-            Console.WriteLine("  -i  use interactive mode to enter all data for one password");
-            Console.WriteLine("  -u  specify user name");
-            Console.WriteLine("  -s  specify site name");
-            Console.WriteLine("  -t  specify type of password as an index value");
-            Console.WriteLine("      Available types of passwords:");
-            var types = GetPasswordTypes();
-            for (int i = 0; i < types.Length; i++)
-            {
-                Console.WriteLine("      " + i + "=" + types[i].ToString());
-            }
-            Console.WriteLine("  -c  specify counter for this site, optional, default is 1");
-            Console.WriteLine("  -p  specify masterpassword to derive the new password from");
-        }
-
-        private static void InteractiveMode()
-        {
-            Console.WriteLine("Interactive mode. Use -? to show help for further options");
-
-            // Interactive mode
-            Console.Write("Enter user name you used:");
-            string userName = Console.ReadLine();
-
-            Console.Write("Enter site name to generate the password for:");
-            string siteName = Console.ReadLine();
-
-            Console.WriteLine(" Types of passwords:");
-            var types = GetPasswordTypes();
-            for (int i = 0; i < types.Length; i++)
-            {
-                Console.WriteLine(" [" + i + "] " + types[i].ToString());
-            }
-
-            Console.Write("Enter type of password (0..." + (types.Length - 1) + "):");
-            var typeAsString = Console.ReadLine();
-            var type = ExtractTypeFromString(types, typeAsString);
-
-            Console.Write("Enter counter for password (allows to change something, use 1 as default):");
-            int counter = int.Parse(Console.ReadLine());
-
-            Console.Write("Enter your master password to generate a password for this site:");
-            string masterPassword = ReadPassword('*');
-
-            // perform
-            Console.WriteLine("Generating password ...");
-
-            GeneratePassword(userName, siteName, type, counter, masterPassword);
         }
 
         /// <summary>
