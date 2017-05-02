@@ -8,7 +8,7 @@ using System.Reflection;
 // define in assembly: [assembly: AssemblyConfiguration("")]
 // define in assembly: [assembly: AssemblyProduct("")]
 [assembly: AssemblyCompany("gomasch.de")]
-[assembly: AssemblyCopyright("Copyright © Martin Schmidt 2015-2016")]
+[assembly: AssemblyCopyright("Copyright © Martin Schmidt 2015-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -17,4 +17,4 @@ using System.Reflection;
 
 // define in assembly: [assembly: AssemblyVersion("1.01.00")]
 // define in assembly: [assembly: AssemblyFileVersion("1.02.00")]
-[assembly: AssemblyInformationalVersion("1.02.01")] // "Product Version"
+[assembly: AssemblyInformationalVersion("1.03.00")] // "Product Version"
