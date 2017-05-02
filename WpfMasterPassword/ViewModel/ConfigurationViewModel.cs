@@ -125,16 +125,166 @@ namespace WpfMasterPassword.ViewModel
             GeneratedForSite.SetValue(selectedEntry.SiteName.Value);
         }
 
+        public void DoMergeImport(string otherFileName)
+        {
+            // our...
+            var our = GetConfiguration();
+
+            var imported = new Configuration();
+
+            // read second
+            try
+            {
+                using (var file = File.OpenRead(otherFileName))
+                {
+                    imported.Load(file);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not open file for import: " + ex.Message);
+                return;
+            }
+
+            // merge
+            Merge.Result result;
+            try
+            {
+                result = Merge.Perform(our, imported);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not merge from imported file : " + ex.Message);
+                return;
+            }
+
+            // preview result...
+            var sb = new StringBuilder();
+            int changes = 0;
+
+            var noChanges = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.Identical).ToList();
+            sb.AppendLine("Identical: " + noChanges.Count + " entries");
+
+            var firstNew = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.FirstNew).ToList();
+            if (firstNew.Count > 0)
+            {
+                // this is just interesting and will not result in changes here
+                sb.AppendLine("Not found in imported: " + firstNew.Count + " entries (not affecting import)");
+                foreach (var item in firstNew)
+                {
+                    sb.AppendLine("  site: " + item.First.SiteName + " (login='" + item.First.Login + "' c=" + item.First.Counter + " t=" + item.First.Type + ")");
+                }
+            }
+            var firstNewer = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.FirstNewer).ToList();
+            if (firstNewer.Count > 0)
+            {
+                // this is just interesting and will not result in changes here
+                sb.AppendLine("Will not affect import - older in imported: " + firstNewer.Count + " entries");
+                foreach (var item in firstNewer)
+                {
+                    sb.AppendLine("  site: " + item.Second.SiteName + " (login='" + item.Second.Login + "' c=" + item.Second.Counter + " t=" + item.Second.Type + ")");
+                }
+            }
+
+            var secondNew = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.SecondNew).ToList();
+            if (secondNew.Count > 0)
+            {
+                changes += secondNew.Count;
+
+                sb.AppendLine("Would be added: " + secondNew.Count + " entries");
+                foreach (var item in secondNew)
+                {
+                    sb.AppendLine("  site: " + item.Second.SiteName + " (login='" + item.Second.Login + "' c=" + item.Second.Counter + " t=" + item.Second.Type + ")");
+                }
+            }
+            var secondNewer = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.SecondNewer).ToList();
+            if (secondNewer.Count > 0)
+            {
+                changes += secondNewer.Count;
+
+                sb.AppendLine("Would be updated: " + secondNewer.Count + " entries");
+                foreach (var item in secondNewer)
+                {
+                    sb.AppendLine("  site: " + item.Second.SiteName + " (login='" + item.Second.Login + "' c=" + item.Second.Counter + " t=" + item.Second.Type + ")");
+                }
+            }
+            var conflicts = result.SitesMerged.Where(m => m.Which == Merge.MergedEntry.Resolution.Conflict).ToList();
+            if (conflicts.Count > 0)
+            {
+                changes += conflicts.Count;
+
+                sb.AppendLine("Conflicts: " + conflicts.Count + " entries (would be added)");
+                foreach (var item in conflicts)
+                {
+                    sb.AppendLine("  site: " + item.Second.SiteName + " (login='" + item.Second.Login + "' c=" + item.Second.Counter + " t=" + item.Second.Type + ")");
+                }
+            }
+
+            if (changes == 0)
+            {   // no changes found
+                CustomMessageBox.Show("Merge found no candidates for changes.", "Import for Merge");
+                return;
+            }
+            if (CustomMessageBox.ShowOKCancel(sb.ToString(), "Do you want to apply these changes?",
+                "Apply Changes", "Cancel") != MessageBoxResult.OK)
+            {   // not sure
+                return;
+            }
+
+            // OK, apply changes
+            foreach (var add in secondNew)
+            {
+                our.Sites.Add(add.Second);
+            }
+            foreach (var update in secondNewer)
+            {
+                // update.First is the original item in our.Sites -> update all from second
+                update.First.Counter = update.Second.Counter;
+                update.First.Login = update.Second.Login;
+                update.First.Type = update.Second.Type;
+            }
+            foreach (var conflict in conflicts)
+            {
+                for (int i = 0; i < our.Sites.Count; i++)
+                {
+                    if (our.Sites[i] == conflict.First)
+                    {   // add here, after the original
+                        our.Sites.Insert(i + 1, conflict.Second);
+                        break;
+                    }
+                }
+            }
+
+            // Update UI
+            SynchronizeLists.Sync(Sites, our.Sites, siteXml =>
+            {
+                var site = new ConfigurationSiteViewModel();
+                site.Login.Value = siteXml.Login;
+                site.SiteName.Value = siteXml.SiteName;
+                site.Counter.Value = siteXml.Counter;
+                site.TypeOfPassword.Value = siteXml.Type;
+                return site;
+            });
+
+            SelectedItem.Value = Sites.FirstOrDefault();
+        }
+
         public void SaveXml(Stream s)
+        {
+            Configuration config = GetConfiguration();
+
+            // save it
+            config.Save(s);
+        }
+
+        private Configuration GetConfiguration()
         {
             var config = new Configuration();
 
             // fill config
             config.UserName = UserName.Value;
             SynchronizeLists.Sync(config.Sites, Sites, (a, b) => false, site => new SiteEntry(site.SiteName.Value, site.Counter.Value, site.Login.Value, site.TypeOfPassword.Value));
-
-            // save it
-            config.Save(s);
+            return config;
         }
 
         public void ReadXml(Stream s)

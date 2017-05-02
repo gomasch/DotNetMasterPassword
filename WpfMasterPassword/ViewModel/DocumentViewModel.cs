@@ -24,6 +24,7 @@ namespace WpfMasterPassword.ViewModel
         public PropertyReadonlyModel<string> FilePathName { get; private set; }
 
         public DelegateCommand Open { get; private set; }
+        public DelegateCommand ImportForMerge { get; private set; }
         public DelegateCommand Save { get; private set; }
         public DelegateCommand SaveAs { get; private set; }
         public DelegateCommand New { get; private set; }
@@ -42,6 +43,7 @@ namespace WpfMasterPassword.ViewModel
             WindowTitle.MonitorForChanges(HasChanges, FilePathName);
 
             Open = new DelegateCommand(() => DoOpen());
+            ImportForMerge = new DelegateCommand(DoImportMerge);
             Save = new DelegateCommand(() => DoSave());
             SaveAs = new DelegateCommand(() => DoSaveAs());
             New = new DelegateCommand(DoNew);
@@ -144,10 +146,28 @@ namespace WpfMasterPassword.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Could not save file " + ex.Message);
+                MessageBox.Show("Could not open file: " + ex.Message);
                 return false;
             }
         }
+
+        private void DoImportMerge()
+        {
+            // ask for file name
+            var dlg = new OpenFileDialog();
+
+            dlg.Filter = FileFilter;
+
+            if (dlg.ShowDialog() != true)
+            {   // user did not want to save
+                return;
+            }
+
+            string newFileName = dlg.FileName;
+
+            Config.DoMergeImport(newFileName);
+        }
+
 
         private bool DoSave()
         {
