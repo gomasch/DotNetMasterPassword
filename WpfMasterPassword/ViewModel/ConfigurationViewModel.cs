@@ -169,7 +169,7 @@ namespace WpfMasterPassword.ViewModel
             if (firstNew.Count > 0)
             {
                 // this is just interesting and will not result in changes here
-                sb.AppendLine("Not found in imported: " + firstNew.Count + " entries (not affecting import)");
+                sb.AppendLine("Will not affect import - not found in imported: " + firstNew.Count + " entries");
                 foreach (var item in firstNew)
                 {
                     sb.AppendLine("  site: " + item.First.SiteName + " (login='" + item.First.Login + "' c=" + item.First.Counter + " t=" + item.First.Type + ")");
@@ -225,6 +225,10 @@ namespace WpfMasterPassword.ViewModel
                 CustomMessageBox.Show("Merge found no candidates for changes.", "Import for Merge");
                 return;
             }
+
+            sb.AppendLine();
+            sb.AppendLine("Summary Of Planned Changes:");
+            sb.AppendLine(" Add=" + secondNew.Count + " (new) Update=" + secondNewer.Count + " Add=" + conflicts.Count + " (conflict)");
             if (CustomMessageBox.ShowOKCancel(sb.ToString(), "Do you want to apply these changes?",
                 "Apply Changes", "Cancel") != MessageBoxResult.OK)
             {   // not sure
