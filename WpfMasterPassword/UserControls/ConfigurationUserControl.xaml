@@ -123,7 +123,7 @@
         <DataGrid Margin="5,0"
                   ItemsSource="{Binding Sites}" AutoGenerateColumns="False" GridLinesVisibility="None" AlternatingRowBackground="Transparent" RowBackground="LightGray" 
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeRows="False" CanUserSortColumns="False"
-                  SelectedItem="{Binding Path=SelectedItem.Value, Mode=TwoWay}" 
+                  SelectedItem="{Binding Path=SelectedItem.Value, Mode=OneWay}" 
                   common:DataGridSelectingItem.SelectingItem="{Binding Path=SelectedItemScrollTo.Value}"
                   RowDetailsVisibilityMode="Visible" BorderBrush="Transparent" RowHeaderWidth="0"
                   >

@@ -26,7 +26,7 @@ namespace WpfMasterPassword.Common
     /// 
     /// Usage in XAML:
     ///   DataGrid 
-    ///          SelectedItem="{Binding Path=SelectedItem.Value, Mode=TwoWay}" 
+    ///          SelectedItem="{Binding Path=SelectedItem.Value, Mode=OneWay}" 
     ///          common:DataGridSelectingItem.SelectingItem="{Binding Path=SelectedItemScrollTo.Value}"
     /// </summary>
     public class DataGridSelectingItem
