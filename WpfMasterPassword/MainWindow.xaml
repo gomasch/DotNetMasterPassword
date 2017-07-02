@@ -76,8 +76,8 @@
                     </Path.RenderTransform>
                 </Path>
             </Button>
-            <Button Command="{Binding ImportForMerge}" Margin="5" Padding="5" ToolTip="Merge from different file (preview is shown first)">
-                <Path Data="M0,6.0699746L21.333,6.0699746 19.887016,17.519974 2.8930044,17.519974z M3.8569996,0L12.956002,0 12.956002,1.5669923 19.044004,1.5669923 19.044004,4.6929766 2.0489988,4.6929766 2.0489988,1.5669923 3.8569996,1.5669923z"
+            <Button Command="{Binding ImportForMerge}" Margin="5" Padding="5" ToolTip="Import differences from a 2nd file for same user (a preview of the changes is shown first)">
+                <Path Data="M3.1756582,6.6390001L3.8488719,7.3030913 2.326757,8.1963098 2.326757,11.824065 2.3287468,11.822765 10.155499,16.487014 17.900822,11.939969 17.919622,11.951669 17.919622,8.3252733 16.313538,7.3681532 16.983532,6.7080421 20.229,8.6416936 20.223801,8.6441941 20.229,8.645534 20.229,13.326613 10.155499,19.241 0,13.188608 0.02075173,13.176908 0.017577915,13.176908 0.017577915,8.5127192 0,8.5023495z M8.4578485,0L11.771601,0 11.771601,6.328068 14.205,6.328068 10.11467,10.367 6.0250001,6.328068 8.4578485,6.328068z"
                       Stretch="Uniform" Fill="#FF7B6DAB" Width="24" Height="24" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" >
                     <Path.RenderTransform>
                         <TransformGroup>
