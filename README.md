@@ -15,12 +15,12 @@ Project Overview:
 * MasterPasswordLib - contains basic algorithm, see http://masterpasswordapp.com/algorithm.html for detailed description of the algorithm (.NET 4.5 / Mono 4.0.0).
 * ConsoleMasterPassword - command line client (.NET 4.5)
 * WpfMasterPassword - simple WPF Windows App (.NET 4.5)
-* MonoMacMasterPassword - simplistic Mac App built with Xamarin Studio and XCode (Mono 4.0.0).
+* MonoMacMasterPassword - simplistic Mac App built with Xamarin Studio and XCode (.NET 4.5).
   Maarten Billemont also has a Mac app though at http://masterpasswordapp.com/, please consider that instead.
 
 Tools used:
 * Windows: Visual Studio 2015
-* Mac: Xamarin Studio 5.8.3, XCode 4.2 (intentionally outdated to still run on my OS X 10.7)
+* Mac: Xamarin Studio 6.3, XCode 7.3.1, Xamarin.Mac 3.2.0.175 (outdated to still run on my OS X 10.11, runs only in debug for some reason)
 
 Screenshots
 
