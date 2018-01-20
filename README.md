@@ -22,6 +22,8 @@ Tools used:
 * Windows: Visual Studio 2015
 * Mac: Xamarin Studio 6.3, XCode 7.3.1, Xamarin.Mac 3.2.0.175 (outdated to still run on my OS X 10.11, runs only in debug for some reason)
 
+NOTE: I've reimplemented this as an Electron app at https://github.com/gomasch/ElectronMPW and switched to using that.
+
 Screenshots
 
 ![Windows GUI Screenshot](WpfMasterPassword/Screenshot.png?raw=true "Windows GUI Screenshot")
